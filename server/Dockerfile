@@ -1,4 +1,4 @@
-FROM node:18.16.0 AS pm-srv-development
+FROM node:18.16.0 AS ism-srv-development
 WORKDIR /app/
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
