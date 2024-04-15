@@ -11,12 +11,31 @@ export const variables = {
     createUser: {
         input: {
             userName: 'testUser1',
-            phoneNumber: '0123456789',
-            password: 'demo1234',
-            firstName: 'test',
-            lastName: '1',
+            phoneNumber: '0944721996',
+            password: '12345678a',
+            firstName: 'Nguyễn ',
+            lastName: 'Minh Trí',
             role: 'Director',
-            avatar: '',
+        },
+    },
+    updateUser: {
+        input: {
+            id: 1,
+            userName: 'testUser1',
+            phoneNumber: '0944721998',
+            firstName: 'Nguyễn',
+            lastName: 'Minh Trí',
+            role: 'Director',
+        },
+    },
+    deleteUser: {
+        input: {
+            ids: [],
+        },
+    },
+    users: {
+        input: {
+            searchQuery: '',
         },
     },
 };

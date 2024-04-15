@@ -29,4 +29,4 @@ export const syncDatabase = async () => {
     }
 };
 
-export * as smDb from '../db_models/mysql/init-models';
+export * as ismDb from '../db_models/mysql/init-models';
