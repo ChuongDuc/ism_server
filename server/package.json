@@ -7,7 +7,7 @@
     "test": "jest",
     "build:live": "nodemon src/server.ts --ignore 'test/*'",
     "start": "npm run build:live",
-    "models-gen": "sequelize-auto -h 127.0.0.1 -d ism-db -u admin -x pm12345678900 -p 3307 --dialect mysql -o \"./src/db_models/mysql\" -l ts && npm run lint:fix-model && npm run prettier:models",
+    "models-gen": "sequelize-auto -h 127.0.0.1 -d ism-db -u admin -x ism12345678900 -p 3307 --dialect mysql -o \"./src/db_models/mysql\" -l ts && npm run lint:fix-model && npm run prettier:models",
     "prettier:models": "npm run prettier:base -- --write \"src/db_models/mysql/*.ts\"",
     "lint:fix-model": "eslint --fix --ext .ts ./src/db_models/mysql",
     "prettier:base": "prettier --parser typescript --single-quote --tab-width 4",
@@ -16,7 +16,7 @@
     "codegen": "graphql-codegen --config codegen.yml && npm run prettier:base -- --write \"src/__generated__/*.ts\""
   },
   "keywords": [],
-  "author": "duckienlh",
+  "author": "chuongduc2201",
   "license": "ISC",
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",

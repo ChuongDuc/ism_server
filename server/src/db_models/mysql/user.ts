@@ -1,6 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
-import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
+import type { order, orderId } from './order';
 
 export interface userAttributes {
     id: number;
@@ -22,9 +22,6 @@ export type userPk = 'id';
 export type userId = user[userPk];
 export type userOptionalAttributes = 'id' | 'email' | 'address' | 'avatarURL' | 'isActive' | 'role' | 'createdAt' | 'updatedAt';
 export type userCreationAttributes = Optional<userAttributes, userOptionalAttributes>;
-
-export type UserEdge = TRDBEdge<user>;
-export type UserConnection = TRDBConnection<user>;
 
 export class user extends Model<userAttributes, userCreationAttributes> implements userAttributes {
     id!: number;
@@ -52,6 +49,29 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
     createdAt?: Date;
 
     updatedAt?: Date;
+
+    // user hasMany order via saleId
+    orders!: order[];
+
+    getOrders!: Sequelize.HasManyGetAssociationsMixin<order>;
+
+    setOrders!: Sequelize.HasManySetAssociationsMixin<order, orderId>;
+
+    addOrder!: Sequelize.HasManyAddAssociationMixin<order, orderId>;
+
+    addOrders!: Sequelize.HasManyAddAssociationsMixin<order, orderId>;
+
+    createOrder!: Sequelize.HasManyCreateAssociationMixin<order>;
+
+    removeOrder!: Sequelize.HasManyRemoveAssociationMixin<order, orderId>;
+
+    removeOrders!: Sequelize.HasManyRemoveAssociationsMixin<order, orderId>;
+
+    hasOrder!: Sequelize.HasManyHasAssociationMixin<order, orderId>;
+
+    hasOrders!: Sequelize.HasManyHasAssociationsMixin<order, orderId>;
+
+    countOrders!: Sequelize.HasManyCountAssociationsMixin;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof user {
         return user.init(
