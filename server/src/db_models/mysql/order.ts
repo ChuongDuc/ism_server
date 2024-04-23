@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { customer, customerId } from './customer';
 import type { itemGroup, itemGroupId } from './itemGroup';
+import type { paymentInfor, paymentInforId } from './paymentInfor';
 import type { user, userId } from './user';
 
 export interface orderAttributes {
@@ -74,6 +75,29 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
     hasItemGroups!: Sequelize.HasManyHasAssociationsMixin<itemGroup, itemGroupId>;
 
     countItemGroups!: Sequelize.HasManyCountAssociationsMixin;
+
+    // order hasMany paymentInfor via orderId
+    paymentInfors!: paymentInfor[];
+
+    getPaymentInfors!: Sequelize.HasManyGetAssociationsMixin<paymentInfor>;
+
+    setPaymentInfors!: Sequelize.HasManySetAssociationsMixin<paymentInfor, paymentInforId>;
+
+    addPaymentInfor!: Sequelize.HasManyAddAssociationMixin<paymentInfor, paymentInforId>;
+
+    addPaymentInfors!: Sequelize.HasManyAddAssociationsMixin<paymentInfor, paymentInforId>;
+
+    createPaymentInfor!: Sequelize.HasManyCreateAssociationMixin<paymentInfor>;
+
+    removePaymentInfor!: Sequelize.HasManyRemoveAssociationMixin<paymentInfor, paymentInforId>;
+
+    removePaymentInfors!: Sequelize.HasManyRemoveAssociationsMixin<paymentInfor, paymentInforId>;
+
+    hasPaymentInfor!: Sequelize.HasManyHasAssociationMixin<paymentInfor, paymentInforId>;
+
+    hasPaymentInfors!: Sequelize.HasManyHasAssociationsMixin<paymentInfor, paymentInforId>;
+
+    countPaymentInfors!: Sequelize.HasManyCountAssociationsMixin;
 
     // order belongsTo user via saleId
     sale!: user;

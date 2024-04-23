@@ -1,0 +1,21 @@
+query ListAllInventory($input: ListAllInventoryInput!) {
+    listAllInventory(input: $input) {
+        edges {
+            cursor
+            node {
+                id
+                productName
+                code
+                weight
+                quantity
+                unit
+                description
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+        totalCount
+    }
+}

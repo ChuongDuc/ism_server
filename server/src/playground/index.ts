@@ -35,7 +35,19 @@ const updateUser = importGraphqlString('./mutations/user/updateUser.graphql');
 
 const deleteUser = importGraphqlString('./mutations/user/deleteUser.graphql');
 
+const importFileExcelInventory = importGraphqlString('./mutations/inventory/importFileExcelInventory.graphql');
+
+const createCustomer = importGraphqlString('./mutations/customer/createCustomer.graphql');
+
+const updateCustomer = importGraphqlString('./mutations/customer/updateCustomer.graphql');
+
+const deleteCustomer = importGraphqlString('./mutations/customer/deleteCustomer.graphql');
+
 const users = importGraphqlString('./queries/user/users.graphql');
+
+const listAllCustomer = importGraphqlString('./queries/customer/listAllCustomer.graphql');
+
+const listAllInventory = importGraphqlString('./queries/inventory/listAllInventory.graphql');
 
 export const queryExample = async (path: string = defaultPath): Promise<Tab[]> => {
     const userAuth = await setUserAuthorization();
@@ -84,6 +96,48 @@ export const queryExample = async (path: string = defaultPath): Promise<Tab[]> =
             query: users,
             headers: userAuth,
             variables: prettifyJsonString(variables.users),
+        },
+        {
+            endpoint: path,
+            name: 'Danh sách khách hàng',
+            query: listAllCustomer,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.listAllCustomer),
+        },
+        {
+            endpoint: path,
+            name: 'Tạo khách hàng mới',
+            query: createCustomer,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.createCustomer),
+        },
+        {
+            endpoint: path,
+            name: 'sửa khách hàng',
+            query: updateCustomer,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.updateCustomer),
+        },
+        {
+            endpoint: path,
+            name: 'Xóa khách hàng',
+            query: deleteCustomer,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.deleteCustomer),
+        },
+        {
+            endpoint: path,
+            name: 'Danh sách tồn kho',
+            query: listAllInventory,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.listAllInventory),
+        },
+        {
+            endpoint: path,
+            name: 'Thêm file excel tồn kho',
+            query: importFileExcelInventory,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.importFileExcelInventory),
         },
     ];
 };

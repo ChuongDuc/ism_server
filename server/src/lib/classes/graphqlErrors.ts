@@ -14,6 +14,11 @@ export enum ISM_ERROR_CODE {
     Permission = 'Permission',
     UserAlreadyExist = 'UserAlreadyExist',
     /**
+     * Customer not found.
+     */
+    CustomerNotFound = 'CustomerNotFound',
+    CustomerAlreadyExist = 'CustomerAlreadyExist',
+    /**
      * Error query in mysql.
      */
     MySQL = 'MySQL',
@@ -88,6 +93,16 @@ export class InvalidPaginationArgumentError extends GraphQLError {
         super(message, {
             extensions: {
                 code: ISM_ERROR_CODE.InvalidPaginationArgument,
+            },
+        });
+    }
+}
+
+export class CustomerAlreadyExistError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'khách hàng không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.CustomerAlreadyExist,
             },
         });
     }
