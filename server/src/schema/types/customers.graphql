@@ -1,0 +1,60 @@
+extend type Query {
+    listAllCustomer(input: ListAllCustomerInput!): CustomerConnection!
+}
+
+extend type Mutation {
+    createCustomer(input: CreateCustomerInput!): Customer!
+
+    updateCustomer(input: UpdateCustomerInput!): SuccessResponse!
+
+    deleteCustomer(input: DeleteCustomerInput!): SuccessResponse!
+}
+
+type Customer {
+    id: Int!
+    name: String
+    phoneNumber: String!
+    email: String
+    address: String
+    company: String
+#    orders: [Order]
+    createdAt: Date
+    updatedAt: Date
+}
+
+type CustomerConnection{
+    edges: [CustomerEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type CustomerEdge {
+    cursor: String!
+    node: Customer
+}
+
+input ListAllCustomerInput{
+    searchQuery: String
+    args: PaginationInput
+}
+
+input CreateCustomerInput {
+    name: String
+    phoneNumber: String!
+    email: String
+    address: String
+    company: String
+}
+
+input UpdateCustomerInput {
+    id: Int!
+    name: String
+    phoneNumber: String
+    email: String
+    address: String
+    company: String
+}
+
+input DeleteCustomerInput {
+    ids: [Int!]!
+}

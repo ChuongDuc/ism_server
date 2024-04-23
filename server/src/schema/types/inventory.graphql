@@ -1,0 +1,40 @@
+extend type Query {
+    listAllInventory(input: ListAllInventoryInput!): InventoryConnection!
+}
+
+extend type Mutation {
+    importFileExcelInventory(input: ImportFileExcelInventoryInput! ): [Inventory]!
+}
+
+type Inventory {
+    id: Int!
+    productName: String!
+    code: String!
+    weight: Float
+    unit: String!
+    quantity: Float!
+    fileName: String!
+    createdAt: Date
+    updatedAt: Date
+}
+
+type InventoryConnection {
+    edges: [InventoryEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type InventoryEdge {
+    cursor: String!
+    node: Inventory
+}
+
+input ImportFileExcelInventoryInput{
+    fileExcelInventory: Upload!
+    fileName: String!
+}
+
+input ListAllInventoryInput {
+    searchQuery: String
+    args: PaginationInput
+}

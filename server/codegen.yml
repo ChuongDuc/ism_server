@@ -12,3 +12,9 @@ generates:
         User: ../db_models/mysql/init-models#user
         UserEdge: ../db_models/mysql/user#UserEdge
         UserConnection: ../db_models/mysql/user#UserConnection
+        Customers: ../db_models/mysql/init-models#customer
+        CustomerEdge: ../db_models/mysql/customer#CustomerEdge
+        CustomerConnection: ../db_models/mysql/customer#CustomerConnection
+        Inventory: ../db_models/mysql/init-models#inventory
+        InventoryEdge: ../db_models/mysql/inventory#InventoryEdge
+        InventoryConnection: ../db_models/mysql/inventory#InventoryConnection

@@ -38,4 +38,44 @@ export const variables = {
             searchQuery: '',
         },
     },
+    listAllCustomer: {
+        input: {
+            searchQuery: '0384686880',
+        },
+    },
+    createCustomer: {
+        input: {
+            name: 'khach hang 1',
+            phoneNumber: '0384686880',
+            email: 'khachhang1@gmail.com',
+            address: 'ha noi',
+            company: 'cong ty 1',
+        },
+    },
+    updateCustomer: {
+        input: {
+            id: 1,
+            name: 'khach hang 1',
+            phoneNumber: '0384686880',
+            email: 'khachhang1@gmail.com',
+            address: 'ha noi',
+            company: 'cong ty 1',
+        },
+    },
+    deleteCustomer: {
+        input: {
+            ids: [],
+        },
+    },
+    listAllInventory: {
+        input: {
+            searchQuery: '',
+        },
+    },
+    importFileExcelInventory: {
+        input: {
+            fileExcelInventory: '',
+            fileName: 'Tonkho.xlsx',
+        },
+    },
 };
