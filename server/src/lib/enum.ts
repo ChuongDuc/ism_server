@@ -15,3 +15,12 @@ export enum RoleList {
 export enum BucketValue {
     DEVAPP = 'dev-app',
 }
+
+export enum Unit {
+    pipe = 'Cây',
+    plate = 'Tấm',
+    cai = 'Cái',
+    chiec = 'Chiếc',
+    m = 'Mét',
+    kg = 'kg',
+}

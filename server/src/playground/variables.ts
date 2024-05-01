@@ -78,4 +78,59 @@ export const variables = {
             fileName: 'Tonkho.xlsx',
         },
     },
+    createCategory: {
+        input: {
+            name: 'category_1',
+        },
+    },
+    updateCategory: {
+        input: {
+            id: 1,
+            name: 'category_1',
+        },
+    },
+    listAllProducts: {
+        input: {
+            name: '',
+        },
+    },
+    importFileExcelProducts: {
+        input: {
+            fileExcelProducts: '',
+        },
+    },
+    createProduct: {
+        input: {
+            categoryId: 1,
+            productName: 'product1',
+            code: 'prd1',
+            price: 10000,
+            unit: '',
+            height: 10,
+            weight: 12,
+            description: 'abc',
+        },
+    },
+    updateProductById: {
+        input: {
+            productId: 1,
+            categoryId: 1,
+            name: 'san pham 1',
+            price: 100001,
+            unit: '',
+            height: 110,
+            weight: 112,
+        },
+    },
+    updateProductPriceById: {
+        input: {
+            productId: 1,
+            price: 150000,
+        },
+    },
+    deleteProduct: {
+        input: {
+            productId: [1],
+        },
+    },
 };

@@ -1,0 +1,101 @@
+extend type Query {
+    listAllProducts(input: ListAllProductsInput!): ProductConnection!
+
+    productDetail(input: ProductDetailInput!): Product!
+}
+
+extend type Mutation {
+    importFileExcelProducts(input: ImportFileExcelProductsInput! ): [Product]!
+
+    updateProductById(input: UpdateProductByIdInput!): SuccessResponse!
+
+    updateProductPriceById(input: UpdateProductPriceByIdInput!): SuccessResponse!
+
+    deleteProductById(input: DeleteProductByIdInput!): SuccessResponse!
+
+    createProduct(input: CreateProductInput!): Product!
+}
+
+enum Unit {
+    pipe
+    plate
+    cai
+    chiec
+    m
+    m2
+    kg
+    cuon
+    md
+}
+
+type Product {
+    id: Int!
+    name: String!
+    code: String
+    price: Float!
+    weight: Float!
+    height: Float!
+    width: Float
+    category: Category!
+    unit: Unit
+    description: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+type ProductConnection {
+    edges: [ProductEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type ProductEdge {
+    cursor: String!
+    node: Product
+}
+
+input ImportFileExcelProductsInput{
+    fileExcelProducts: Upload!
+    categoryId: Int!
+}
+
+input ListAllProductsInput {
+    name: String
+    unit: Unit
+    category: Int
+    args: PaginationInput
+}
+
+input UpdateProductByIdInput {
+    productId: Int!
+    name: String
+    weight: Float
+    height: Float
+    price: Float
+    categoryId: Int!
+    unit: Unit
+}
+
+input UpdateProductPriceByIdInput {
+    productId:[Int!]!
+    price: Float
+}
+
+input DeleteProductByIdInput {
+    productId:[Int!]!
+}
+
+input CreateProductInput {
+    productName: String!
+    code: String
+    price: Float!
+    weight: Float!
+    height: Float!
+    categoryId: Int!
+    unit: Unit
+    description: String
+}
+
+input ProductDetailInput {
+    id: Int!
+}

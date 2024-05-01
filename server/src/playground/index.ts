@@ -37,17 +37,35 @@ const deleteUser = importGraphqlString('./mutations/user/deleteUser.graphql');
 
 const importFileExcelInventory = importGraphqlString('./mutations/inventory/importFileExcelInventory.graphql');
 
+const importFileExcelProducts = importGraphqlString('./mutations/product/importFileExcelProducts.graphql');
+
 const createCustomer = importGraphqlString('./mutations/customer/createCustomer.graphql');
 
 const updateCustomer = importGraphqlString('./mutations/customer/updateCustomer.graphql');
 
 const deleteCustomer = importGraphqlString('./mutations/customer/deleteCustomer.graphql');
 
+const createCategory = importGraphqlString('./mutations/category/createCategory.graphql');
+
+const updateCategory = importGraphqlString('./mutations/category/updateCategory.graphql');
+
+const createProduct = importGraphqlString('./mutations/product/createProduct.graphql');
+
+const updateProductById = importGraphqlString('./mutations/product/updateProductById.graphql');
+
+const updateProductPriceById = importGraphqlString('./mutations/product/updateProductPriceById.graphql');
+
+const deleteProduct = importGraphqlString('./mutations/product/deleteProduct.graphql');
+
 const users = importGraphqlString('./queries/user/users.graphql');
 
 const listAllCustomer = importGraphqlString('./queries/customer/listAllCustomer.graphql');
 
 const listAllInventory = importGraphqlString('./queries/inventory/listAllInventory.graphql');
+
+const getAllCategory = importGraphqlString('./queries/category/getAllCategory.graphql');
+
+const listAllProducts = importGraphqlString('./queries/product/listAllProducts.graphql');
 
 export const queryExample = async (path: string = defaultPath): Promise<Tab[]> => {
     const userAuth = await setUserAuthorization();
@@ -138,6 +156,68 @@ export const queryExample = async (path: string = defaultPath): Promise<Tab[]> =
             query: importFileExcelInventory,
             headers: userAuth,
             variables: prettifyJsonString(variables.importFileExcelInventory),
+        },
+        {
+            endpoint: path,
+            name: 'Danh sách loại sản phẩm',
+            query: getAllCategory,
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Thêm loại sản phẩm mới',
+            query: createCategory,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.createCategory),
+        },
+        {
+            endpoint: path,
+            name: 'Sửa loại sản phẩm',
+            query: updateCategory,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.updateCategory),
+        },
+        {
+            endpoint: path,
+            name: 'lấy tất cả sản phẩm',
+            query: listAllProducts,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.listAllProducts),
+        },
+        {
+            endpoint: path,
+            name: 'Thêm file excel sản phầm',
+            query: importFileExcelProducts,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.importFileExcelProducts),
+        },
+        {
+            endpoint: path,
+            name: 'Thêm sản phẩm mới',
+            query: createProduct,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.createProduct),
+        },
+        {
+            endpoint: path,
+            name: 'Sửa sản phẩm',
+            query: updateProductById,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.updateProductById),
+        },
+        {
+            endpoint: path,
+            name: 'Sửa giá sản phẩm',
+            query: updateProductPriceById,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.updateProductPriceById),
+        },
+        {
+            endpoint: path,
+            name: 'Xóa sản phẩm',
+            query: deleteProduct,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.deleteProduct),
         },
     ];
 };

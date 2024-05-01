@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { categories, categoriesId } from './categories';
 import type { orderDetail, orderDetailId } from './orderDetail';
+import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface productAttributes {
     id: number;
@@ -21,6 +22,9 @@ export type productPk = 'id';
 export type productId = product[productPk];
 export type productOptionalAttributes = 'id' | 'code' | 'unit' | 'description' | 'createdAt' | 'updatedAt';
 export type productCreationAttributes = Optional<productAttributes, productOptionalAttributes>;
+
+export type ProductEdge = TRDBEdge<product>;
+export type ProductConnection = TRDBConnection<product>;
 
 export class product extends Model<productAttributes, productCreationAttributes> implements productAttributes {
     id!: number;

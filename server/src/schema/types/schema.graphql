@@ -6,6 +6,13 @@ schema {
     subscription: Subscription
 }
 
+type Category {
+    createdAt: Date
+    id: Int
+    name: String
+    updatedAt: Date
+}
+
 type Customer {
     address: String
     company: String
@@ -52,12 +59,19 @@ type InventoryEdge {
 }
 
 type Mutation {
+    createCategory(input: CreateCategoryInput!): Category!
     createCustomer(input: CreateCustomerInput!): Customer!
+    createProduct(input: CreateProductInput!): Product!
     createUser(input: CreateUserInput!): User!
     deleteCustomer(input: DeleteCustomerInput!): SuccessResponse!
+    deleteProductById(input: DeleteProductByIdInput!): SuccessResponse!
     deleteUser(input: DeleteUserInput!): SuccessResponse!
     importFileExcelInventory(input: ImportFileExcelInventoryInput!): [Inventory]!
+    importFileExcelProducts(input: ImportFileExcelProductsInput!): [Product]!
+    updateCategory(input: UpdateCategoryInput!): SuccessResponse!
     updateCustomer(input: UpdateCustomerInput!): SuccessResponse!
+    updateProductById(input: UpdateProductByIdInput!): SuccessResponse!
+    updateProductPriceById(input: UpdateProductPriceByIdInput!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
 }
 
@@ -66,11 +80,40 @@ type PageInfo {
     hasNextPage: Boolean!
 }
 
+type Product {
+    category: Category!
+    code: String
+    createdAt: Date
+    description: String
+    height: Float!
+    id: Int!
+    name: String!
+    price: Float!
+    unit: Unit
+    updatedAt: Date
+    weight: Float!
+    width: Float
+}
+
+type ProductConnection {
+    edges: [ProductEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type ProductEdge {
+    cursor: String!
+    node: Product
+}
+
 type Query {
+    getAllCategory: [Category]!
     listAllCustomer(input: ListAllCustomerInput!): CustomerConnection!
     listAllInventory(input: ListAllInventoryInput!): InventoryConnection!
+    listAllProducts(input: ListAllProductsInput!): ProductConnection!
     login(input: UserLoginInput!): UserLoginResponse!
     me: User!
+    productDetail(input: ProductDetailInput!): Product!
     users(input: UsersInput!): UserConnection!
 }
 
@@ -125,6 +168,18 @@ enum SuccessResponse {
     success
 }
 
+enum Unit {
+    cai
+    chiec
+    cuon
+    kg
+    m
+    m2
+    md
+    pipe
+    plate
+}
+
 scalar Cursor
 
 scalar Date
@@ -133,12 +188,27 @@ scalar JSON
 
 scalar Upload
 
+input CreateCategoryInput {
+    name: String!
+}
+
 input CreateCustomerInput {
     address: String
     company: String
     email: String
     name: String
     phoneNumber: String!
+}
+
+input CreateProductInput {
+    categoryId: Int!
+    code: String
+    description: String
+    height: Float!
+    price: Float!
+    productName: String!
+    unit: Unit
+    weight: Float!
 }
 
 input CreateUserInput {
@@ -157,6 +227,10 @@ input DeleteCustomerInput {
     ids: [Int!]!
 }
 
+input DeleteProductByIdInput {
+    productId: [Int!]!
+}
+
 input DeleteUserInput {
     ids: [Int!]!
 }
@@ -164,6 +238,11 @@ input DeleteUserInput {
 input ImportFileExcelInventoryInput {
     fileExcelInventory: Upload!
     fileName: String!
+}
+
+input ImportFileExcelProductsInput {
+    categoryId: Int!
+    fileExcelProducts: Upload!
 }
 
 input ListAllCustomerInput {
@@ -176,11 +255,27 @@ input ListAllInventoryInput {
     searchQuery: String
 }
 
+input ListAllProductsInput {
+    args: PaginationInput
+    category: Int
+    name: String
+    unit: Unit
+}
+
 input PaginationInput {
     after: Cursor
     before: Cursor
     first: Int
     last: Int
+}
+
+input ProductDetailInput {
+    id: Int!
+}
+
+input UpdateCategoryInput {
+    id: Int!
+    name: String
 }
 
 input UpdateCustomerInput {
@@ -190,6 +285,21 @@ input UpdateCustomerInput {
     id: Int!
     name: String
     phoneNumber: String
+}
+
+input UpdateProductByIdInput {
+    categoryId: Int!
+    height: Float
+    name: String
+    price: Float
+    productId: Int!
+    unit: Unit
+    weight: Float
+}
+
+input UpdateProductPriceByIdInput {
+    price: Float
+    productId: [Int!]!
 }
 
 input UpdateUserInput {

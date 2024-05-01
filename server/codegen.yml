@@ -18,3 +18,7 @@ generates:
         Inventory: ../db_models/mysql/init-models#inventory
         InventoryEdge: ../db_models/mysql/inventory#InventoryEdge
         InventoryConnection: ../db_models/mysql/inventory#InventoryConnection
+        Category: ../db_models/mysql/init-models#categories
+        Product: ../db_models/mysql/init-models#product
+        ProductEdge: ../db_models/mysql/product#ProductEdge
+        ProductConnection: ../db_models/mysql/product#ProductConnection

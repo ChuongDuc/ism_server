@@ -1,6 +1,6 @@
-import { IRole } from '../__generated__/graphql';
-import { RoleList } from './enum';
-import { InValidRoleError } from './classes/graphqlErrors';
+import { IRole, IUnit } from '../__generated__/graphql';
+import { RoleList, Unit } from './enum';
+import { InValidRoleError, InValidValueError } from './classes/graphqlErrors';
 
 export const iRoleToNumber = (role: IRole) => {
     switch (role) {
@@ -45,5 +45,43 @@ export const roleNumberToIRole = (roleNumber: RoleList) => {
             return IRole.AssistantDriver;
         default:
             throw new InValidRoleError();
+    }
+};
+
+export const UnitStringToIUnit = (unitString: string | undefined) => {
+    switch (unitString) {
+        case Unit.pipe:
+            return IUnit.Pipe;
+        case Unit.plate:
+            return IUnit.Plate;
+        case Unit.cai:
+            return IUnit.Cai;
+        case Unit.chiec:
+            return IUnit.Chiec;
+        case Unit.m:
+            return IUnit.M;
+        case Unit.kg:
+            return IUnit.Kg;
+        default:
+            throw new InValidValueError();
+    }
+};
+
+export const iUnitToUnit = (unitInput: IUnit) => {
+    switch (unitInput) {
+        case IUnit.Pipe:
+            return Unit.pipe;
+        case IUnit.Plate:
+            return Unit.plate;
+        case IUnit.Cai:
+            return Unit.cai;
+        case IUnit.Chiec:
+            return Unit.chiec;
+        case IUnit.M:
+            return Unit.m;
+        case IUnit.Kg:
+            return Unit.kg;
+        default:
+            throw new InValidValueError();
     }
 };
