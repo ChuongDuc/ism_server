@@ -1,0 +1,9 @@
+type PaymentInfo {
+    id: Int!
+    customer: Customer!
+    order: Order!
+    money: Float
+    description: String
+    createdAt: Date
+    updatedAt: Date
+}

@@ -1,5 +1,7 @@
 import { storageConfig } from '../../constant/appConfiguration';
 import MinIOServices from './MinIOServices';
+import { publisher, subscriber } from './redis';
+import PubSubService from './PubSubService';
 
 export const minIOServices = new MinIOServices({
     bucketName: storageConfig.minIO.bucket,
@@ -11,3 +13,5 @@ export const minIOServices = new MinIOServices({
     accessKey: storageConfig.minIO.accessKey,
     secretKey: storageConfig.minIO.secretKey,
 });
+
+export const pubsubService = new PubSubService(publisher, subscriber);

@@ -23,7 +23,11 @@ const setUserAuthorization = async () => {
 
 const defaultPath = `http://${process.env.ISM_SERVER_HOST || 'localhost'}:${process.env.ISM_SERVER_PORT || '4000'}/graphql`;
 
+// const defaultSubscriptionPath = `ws://${process.env.SSM_SERVER_HOST || 'localhost'}:${process.env.SSM_SERVER_PORT || '4000'}/subscriptions`;
+
 const prettifyJsonString = (variable: any) => JSON.stringify(variable, null, 2);
+//
+// const getMessage = importGraphqlString('./subscription/getMessage.graphql');
 
 const login = importGraphqlString('./queries/authentication/login.graphql');
 
@@ -57,6 +61,10 @@ const updateProductPriceById = importGraphqlString('./mutations/product/updatePr
 
 const deleteProduct = importGraphqlString('./mutations/product/deleteProduct.graphql');
 
+const createOrder = importGraphqlString('./mutations/order/createOrder.graphql');
+
+const updateOrder = importGraphqlString('./mutations/order/updateOrder.graphql');
+
 const users = importGraphqlString('./queries/user/users.graphql');
 
 const listAllCustomer = importGraphqlString('./queries/customer/listAllCustomer.graphql');
@@ -75,6 +83,13 @@ export const queryExample = async (path: string = defaultPath): Promise<Tab[]> =
     //     },
     // };
     return [
+        // {
+        //     endpoint: defaultSubscriptionPath,
+        //     name: 'Subscription',
+        //     query: getMessage,
+        //     headers: subscriptionHeaders as any,
+        //     variables: prettifyJsonString(variables.getMessage),
+        // },
         {
             endpoint: path,
             name: 'Current user',
@@ -218,6 +233,20 @@ export const queryExample = async (path: string = defaultPath): Promise<Tab[]> =
             query: deleteProduct,
             headers: userAuth,
             variables: prettifyJsonString(variables.deleteProduct),
+        },
+        {
+            endpoint: path,
+            name: 'Tạo order',
+            query: createOrder,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.createOrder),
+        },
+        {
+            endpoint: path,
+            name: 'Sửa order',
+            query: updateOrder,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.updateOrder),
         },
     ];
 };

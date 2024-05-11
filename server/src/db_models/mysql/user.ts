@@ -2,6 +2,8 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { order, orderId } from './order';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
+import { userNotification } from './init-models';
+import { userNotificationId } from './userNotification';
 
 export interface userAttributes {
     id: number;
@@ -76,6 +78,29 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
     hasOrders!: Sequelize.HasManyHasAssociationsMixin<order, orderId>;
 
     countOrders!: Sequelize.HasManyCountAssociationsMixin;
+
+    // user hasMany userNotification via userId
+    userNotifications!: userNotification[];
+
+    getUserNotifications!: Sequelize.HasManyGetAssociationsMixin<userNotification>;
+
+    setUserNotifications!: Sequelize.HasManySetAssociationsMixin<userNotification, userNotificationId>;
+
+    addUserNotification!: Sequelize.HasManyAddAssociationMixin<userNotification, userNotificationId>;
+
+    addUserNotifications!: Sequelize.HasManyAddAssociationsMixin<userNotification, userNotificationId>;
+
+    createUserNotification!: Sequelize.HasManyCreateAssociationMixin<userNotification>;
+
+    removeUserNotification!: Sequelize.HasManyRemoveAssociationMixin<userNotification, userNotificationId>;
+
+    removeUserNotifications!: Sequelize.HasManyRemoveAssociationsMixin<userNotification, userNotificationId>;
+
+    hasUserNotification!: Sequelize.HasManyHasAssociationMixin<userNotification, userNotificationId>;
+
+    hasUserNotifications!: Sequelize.HasManyHasAssociationsMixin<userNotification, userNotificationId>;
+
+    countUserNotifications!: Sequelize.HasManyCountAssociationsMixin;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof user {
         return user.init(

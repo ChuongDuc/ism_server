@@ -20,6 +20,10 @@ export enum ISM_ERROR_CODE {
     CustomerNotFound = 'CustomerNotFound',
     CustomerAlreadyExist = 'CustomerAlreadyExist',
     /**
+     * Order.
+     */
+    OrderNotFound = 'OrderNotFound',
+    /**
      * Category.
      */
     CategoryNotFound = 'CategoryNotFound',
@@ -153,6 +157,26 @@ export class ProductNotFoundError extends GraphQLError {
         super(message || 'Sản phẩm không tồn tại', {
             extensions: {
                 code: ISM_ERROR_CODE.ProductNotFound,
+            },
+        });
+    }
+}
+
+export class CustomerNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Khách hàng không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.CustomerNotFound,
+            },
+        });
+    }
+}
+
+export class OrderNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Hoá đơn không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.OrderNotFound,
             },
         });
     }

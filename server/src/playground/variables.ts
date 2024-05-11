@@ -2,6 +2,9 @@ const adminAccount = 'admin';
 const password = 'demo1234';
 
 export const variables = {
+    // getMessage: {
+    //     userId: 1,
+    // },
     login: {
         input: {
             account: adminAccount,
@@ -131,6 +134,18 @@ export const variables = {
     deleteProduct: {
         input: {
             productId: [1],
+        },
+    },
+    createOrder: {
+        input: {
+            customerId: 1,
+            saleUserId: 5,
+        },
+    },
+    updateOrder: {
+        input: {
+            orderId: 1,
+            saleUserId: 5,
         },
     },
 };

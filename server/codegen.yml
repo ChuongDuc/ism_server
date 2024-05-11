@@ -12,7 +12,7 @@ generates:
         User: ../db_models/mysql/init-models#user
         UserEdge: ../db_models/mysql/user#UserEdge
         UserConnection: ../db_models/mysql/user#UserConnection
-        Customers: ../db_models/mysql/init-models#customer
+        Customer: ../db_models/mysql/init-models#customer
         CustomerEdge: ../db_models/mysql/customer#CustomerEdge
         CustomerConnection: ../db_models/mysql/customer#CustomerConnection
         Inventory: ../db_models/mysql/init-models#inventory
@@ -22,3 +22,9 @@ generates:
         Product: ../db_models/mysql/init-models#product
         ProductEdge: ../db_models/mysql/product#ProductEdge
         ProductConnection: ../db_models/mysql/product#ProductConnection
+        Notification: ../db_models/mysql/init-models#notification
+        UserNotification: ../db_models/mysql/init-models#userNotification
+        Order: ../db_models/mysql/init-models#order
+        PaymentInfor: ../db_models/mysql/init-models#paymentInfor
+        ItemGroup: ../db_models/mysql/init-models#itemGroup
+        OrderDetail: ../db_models/mysql/init-models#orderDetail
