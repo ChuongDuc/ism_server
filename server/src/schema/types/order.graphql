@@ -1,0 +1,97 @@
+extend type Query {
+    filterAllOrder(input: FilterAllOrderInput!): OrderConnection!
+}
+
+extend type Mutation {
+    createOrder(input: CreateOrderInput!): Order!
+
+    updateOrder(input: UpdateOrderInput!): SuccessResponse!
+}
+
+enum StatusOrder {
+    creatNew
+    priceQuotation
+    createExportOrder
+    delivery
+    successDelivery
+    paymentConfirmation
+    paid
+    done
+}
+
+type OrderConnection{
+    edges: [OrderEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type OrderEdge {
+    cursor: String!
+    node: Order
+}
+
+input CreateOrderInput {
+    customerId: Int!
+    saleUserId: Int!
+    VAT: Float
+}
+
+input UpdateOrderInput {
+    orderId: Int!
+    customerId: Int
+    saleUserId: Int
+    VAT: Float
+    status: StatusOrder
+    driverUserId: Int
+}
+
+type OrderDetail {
+    id: Int!
+    itemGroup: ItemGroup!
+    product: Product!
+    quantity: Float!
+    priceProduct: Float!
+    weightProduct: Float
+    totalWeight: Float
+    description: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+type ItemGroup {
+    id: Int!
+    orderDetailList:[OrderDetail!]
+    name: String
+    description: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+type Order {
+    id: Int!
+    customer: Customer!
+    sale: User!
+    invoiceNo: String!
+    VAT: Float
+    status: StatusOrder
+    freightPrice: Float
+    deliverAddress: String
+    itemGroupList: [ItemGroup]
+    paymentList: [PaymentInfo]
+    totalMoney: Float
+    remainingPaymentMoney: Float
+    createdAt: Date
+    updatedAt: Date
+}
+
+input FilterAllOrderInput {
+    queryString: String
+    saleId: Int
+    createAt: filterDate
+    args: PaginationInput
+}
+
+input filterDate{
+    startAt: Date!
+    endAt: Date!
+}

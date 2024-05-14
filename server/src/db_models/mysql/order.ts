@@ -1,9 +1,15 @@
 import * as Sequelize from 'sequelize';
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, Model, Op, Optional } from 'sequelize';
 import type { customer, customerId } from './customer';
 import type { itemGroup, itemGroupId } from './itemGroup';
+import type { notification, notificationId } from './notification';
 import type { paymentInfor, paymentInforId } from './paymentInfor';
 import type { user, userId } from './user';
+import { ismDb } from '../../loader/mysql';
+import { fDateTimeForInvoiceNoDayMonYear } from '../../lib/utils/formatTime';
+import { extractFirstName } from '../../lib/utils/others';
+import { UserNotFoundError } from '../../lib/classes/graphqlErrors';
+import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface orderAttributes {
     id: number;
@@ -23,6 +29,9 @@ export type orderId = order[orderPk];
 export type orderOptionalAttributes = 'id' | 'VAT' | 'freightPrice' | 'deliverAddress' | 'status' | 'createdAt' | 'updatedAt';
 export type orderCreationAttributes = Optional<orderAttributes, orderOptionalAttributes>;
 
+export type OrderEdge = TRDBEdge<order>;
+export type OrderConnection = TRDBConnection<order>;
+
 export class order extends Model<orderAttributes, orderCreationAttributes> implements orderAttributes {
     id!: number;
 
@@ -39,6 +48,10 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
     deliverAddress?: string;
 
     status?: string;
+
+    totalMoney!: number;
+
+    remainingPaymentMoney!: number;
 
     createdAt?: Date;
 
@@ -76,6 +89,29 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
 
     countItemGroups!: Sequelize.HasManyCountAssociationsMixin;
 
+    // order hasMany notification via orderId
+    notifications!: notification[];
+
+    getNotifications!: Sequelize.HasManyGetAssociationsMixin<notification>;
+
+    setNotifications!: Sequelize.HasManySetAssociationsMixin<notification, notificationId>;
+
+    addNotification!: Sequelize.HasManyAddAssociationMixin<notification, notificationId>;
+
+    addNotifications!: Sequelize.HasManyAddAssociationsMixin<notification, notificationId>;
+
+    createNotification!: Sequelize.HasManyCreateAssociationMixin<notification>;
+
+    removeNotification!: Sequelize.HasManyRemoveAssociationMixin<notification, notificationId>;
+
+    removeNotifications!: Sequelize.HasManyRemoveAssociationsMixin<notification, notificationId>;
+
+    hasNotification!: Sequelize.HasManyHasAssociationMixin<notification, notificationId>;
+
+    hasNotifications!: Sequelize.HasManyHasAssociationsMixin<notification, notificationId>;
+
+    countNotifications!: Sequelize.HasManyCountAssociationsMixin;
+
     // order hasMany paymentInfor via orderId
     paymentInfors!: paymentInfor[];
 
@@ -107,6 +143,75 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
     setSale!: Sequelize.BelongsToSetAssociationMixin<user, userId>;
 
     createSale!: Sequelize.BelongsToCreateAssociationMixin<user>;
+
+    async getTotalMoney(): Promise<number> {
+        const itemGroups = this.itemGroups ?? (await this.getItemGroups());
+        const orderDetails: ismDb.orderDetail[] = [];
+        // eslint-disable-next-line no-plusplus
+        for (let i = 0; i < itemGroups.length; i++) {
+            // eslint-disable-next-line no-await-in-loop
+            const ods: ismDb.orderDetail[] = itemGroups[i].orderDetails ?? (await itemGroups[i].getOrderDetails());
+            ods.forEach((od) => orderDetails.push(od));
+        }
+
+        this.totalMoney = orderDetails.reduce(
+            (sum, odt) =>
+                sum +
+                (odt.productId
+                    ? parseFloat(String(odt.priceProduct)) *
+                      parseFloat(
+                          `${
+                              odt.totalWeight
+                                  ? odt.totalWeight
+                                  : parseFloat(`${odt.quantity ? odt.quantity : 0}`) *
+                                    parseFloat(odt.weightProduct ? String(odt.weightProduct) : String(odt.product.weight))
+                          }`
+                      )
+                    : 0.0),
+            0.0
+        );
+        return this.totalMoney;
+    }
+
+    async calculateRemainingPaymentMoney() {
+        const oPayment =
+            this.paymentInfors ??
+            (await ismDb.paymentInfor.findAll({
+                where: {
+                    orderId: this.id,
+                },
+            }));
+
+        await this.getTotalMoney();
+
+        this.remainingPaymentMoney =
+            this.totalMoney +
+            (this.freightPrice ? parseFloat(String(this.freightPrice)) : 0.0) +
+            (this.VAT ? parseFloat(String((this.totalMoney * this.VAT) / 100)) : 0.0) -
+            oPayment.reduce((sum, opm) => sum + (opm.id ? parseFloat(String(opm.money)) : 0.0), 0.0);
+
+        return this.remainingPaymentMoney;
+    }
+
+    static async invoiceNoOrderName(saleId: number) {
+        const today = new Date();
+        const formatToDay = fDateTimeForInvoiceNoDayMonYear(today);
+        const startOfDay = new Date(today).setHours(0, 0, 0, 0);
+        const endOfDay = new Date(today).setHours(23, 59, 59, 999);
+
+        const getSale = await ismDb.user.findByPk(saleId, { rejectOnEmpty: new UserNotFoundError() });
+
+        const numberOrderOfSale = await ismDb.order.findAll({
+            where: {
+                saleId,
+                createdAt: {
+                    [Op.between]: [startOfDay, endOfDay],
+                },
+            },
+        });
+
+        return `${formatToDay}_${extractFirstName(getSale.firstName)}_${numberOrderOfSale.length + 1}`;
+    }
 
     static initModel(sequelize: Sequelize.Sequelize): typeof order {
         return order.init(

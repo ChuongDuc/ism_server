@@ -13,9 +13,9 @@ const customer_resolver: IResolvers = {
 
     CustomerConnection: rdbConnectionResolver,
 
-    // Customer: {
-    //     orders: async (parent) => parent.orders ?? (await parent.getOrders()),
-    // },
+    Customer: {
+        orders: async (parent) => parent.orders ?? (await parent.getOrders()),
+    },
 
     Query: {
         listAllCustomer: async (_parent, { input }, context: SmContext) => {

@@ -15,3 +15,23 @@ export enum RoleList {
 export enum BucketValue {
     DEVAPP = 'dev-app',
 }
+
+export enum Unit {
+    pipe = 'Cây',
+    plate = 'Tấm',
+    cai = 'Cái',
+    chiec = 'Chiếc',
+    m = 'Mét',
+    kg = 'kg',
+}
+
+export enum StatusOrder {
+    creatNew = 'Tạo mới',
+    priceQuotation = 'Báo giá - Chăm sóc KH',
+    createExportOrder = 'Chốt đơn - Tạo lệnh xuất hàng',
+    delivery = 'Đang giao hàng',
+    successDelivery = 'Giao hàng thành công',
+    paymentConfirmation = 'Xác nhận thanh toán và hồ sơ',
+    paid = 'Đã thanh toán',
+    done = 'Đơn hàng hoàn thành',
+}

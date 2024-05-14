@@ -13,11 +13,25 @@ export enum ISM_ERROR_CODE {
     InValidRole = 'InValidRole',
     Permission = 'Permission',
     UserAlreadyExist = 'UserAlreadyExist',
+    InValidValueError = 'InValidValueError',
     /**
-     * Customer not found.
+     * Customer.
      */
     CustomerNotFound = 'CustomerNotFound',
     CustomerAlreadyExist = 'CustomerAlreadyExist',
+    /**
+     * Order.
+     */
+    OrderNotFound = 'OrderNotFound',
+    /**
+     * Category.
+     */
+    CategoryNotFound = 'CategoryNotFound',
+    CategoryAlreadyExistError = 'CategoryAlreadyExistError',
+    /**
+     * Product.
+     */
+    ProductNotFound = 'ProductNotFound',
     /**
      * Error query in mysql.
      */
@@ -103,6 +117,66 @@ export class CustomerAlreadyExistError extends GraphQLError {
         super(message || 'khách hàng không tồn tại', {
             extensions: {
                 code: ISM_ERROR_CODE.CustomerAlreadyExist,
+            },
+        });
+    }
+}
+
+export class CategoryAlreadyExistError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'khách hàng không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.CategoryAlreadyExistError,
+            },
+        });
+    }
+}
+
+export class InValidValueError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Không xác định được giá trị truyền vào', {
+            extensions: {
+                code: ISM_ERROR_CODE.InValidValueError,
+            },
+        });
+    }
+}
+
+export class CategoryNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Không tìm thấy danh mục', {
+            extensions: {
+                code: ISM_ERROR_CODE.CategoryNotFound,
+            },
+        });
+    }
+}
+
+export class ProductNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Sản phẩm không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.ProductNotFound,
+            },
+        });
+    }
+}
+
+export class CustomerNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Khách hàng không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.CustomerNotFound,
+            },
+        });
+    }
+}
+
+export class OrderNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Hoá đơn không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.OrderNotFound,
             },
         });
     }

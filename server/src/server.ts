@@ -23,6 +23,7 @@ import { USER_JWT } from './lib/utils/jwt';
 import { syncDatabase } from './loader/mysql';
 import { appConfig } from './constant/appConfiguration';
 import { queryExample } from './playground';
+import PubSubService from './lib/classes/PubSubService';
 
 export interface SmContext {
     isAuth: boolean;
@@ -31,7 +32,7 @@ export interface SmContext {
     req: express.Request;
     res: express.Response;
     // awsS3StorageService: AwsS3StorageService;
-    // pubsub: PubSubService;
+    pubsub: PubSubService;
 }
 
 interface ContextFunctionProps {

@@ -2,8 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { order, orderId } from './order';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
-import { paymentInfor } from './init-models';
-import { paymentInforId } from './paymentInfor';
+import type { paymentInfor, paymentInforId } from './paymentInfor';
 
 export interface customerAttributes {
     id: number;

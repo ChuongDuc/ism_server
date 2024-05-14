@@ -1,0 +1,26 @@
+query ListAllProducts($input: ListAllProductsInput!) {
+    listAllProducts(input: $input) {
+        edges {
+            cursor
+            node {
+                id
+                name
+                code
+                price
+                weight
+                height
+                category{
+                    id
+                    name
+                }
+                unit
+                description
+            }
+        }
+        pageInfo{
+            hasNextPage
+            endCursor
+        }
+        totalCount
+    }
+}
