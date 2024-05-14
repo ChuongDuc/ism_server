@@ -1,3 +1,7 @@
+extend type Query {
+    filterAllOrder(input: FilterAllOrderInput!): OrderConnection!
+}
+
 extend type Mutation {
     createOrder(input: CreateOrderInput!): Order!
 
@@ -13,6 +17,17 @@ enum StatusOrder {
     paymentConfirmation
     paid
     done
+}
+
+type OrderConnection{
+    edges: [OrderEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type OrderEdge {
+    cursor: String!
+    node: Order
 }
 
 input CreateOrderInput {
@@ -67,4 +82,16 @@ type Order {
     remainingPaymentMoney: Float
     createdAt: Date
     updatedAt: Date
+}
+
+input FilterAllOrderInput {
+    queryString: String
+    saleId: Int
+    createAt: filterDate
+    args: PaginationInput
+}
+
+input filterDate{
+    startAt: Date!
+    endAt: Date!
 }

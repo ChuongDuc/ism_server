@@ -1,14 +1,23 @@
-import { Transaction } from 'sequelize';
+import { FindAndCountOptions, Op, Transaction, WhereOptions } from 'sequelize';
+import { isEmpty } from 'lodash';
 import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
 import { iStatusOrderToStatusOrder, IStatusOrderTypeResolve } from '../../lib/resolver_enum';
 import { SmContext } from '../../server';
 import { RoleList, StatusOrder } from '../../lib/enum';
 import { checkAuthentication } from '../../lib/utils/permision';
-import { MySQLError, OrderNotFoundError, PermissionError } from '../../lib/classes/graphqlErrors';
+import { MySQLError, OrderNotFoundError, PermissionError, UserNotFoundError } from '../../lib/classes/graphqlErrors';
 import { ismDb, sequelize } from '../../loader/mysql';
-import { orderCreationAttributes } from '../../db_models/mysql/order';
+import { orderAttributes, orderCreationAttributes } from '../../db_models/mysql/order';
+import { convertRDBRowsToConnection, getRDBPaginationParams, rdbConnectionResolver, rdbEdgeResolver } from '../../lib/utils/relay';
+import { userNotificationCreationAttributes } from '../../db_models/mysql/userNotification';
+import { NotificationEvent } from '../../lib/classes/PubSubService';
+import { notificationCreationAttributes } from '../../db_models/mysql/notification';
 
 const order_resolver: IResolvers = {
+    OrderEdge: rdbEdgeResolver,
+
+    OrderConnection: rdbConnectionResolver,
+
     Order: {
         customer: async (parent) => parent.customer ?? (await parent.getCustomer()),
 
@@ -23,6 +32,90 @@ const order_resolver: IResolvers = {
         totalMoney: async (parent) => await parent.getTotalMoney(),
 
         remainingPaymentMoney: async (parent) => await parent.calculateRemainingPaymentMoney(),
+    },
+
+    Query: {
+        filterAllOrder: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            const { queryString, saleId, createAt, args } = input;
+
+            const { limit, offset, limitForLast } = getRDBPaginationParams(args);
+
+            const option: FindAndCountOptions = {
+                limit,
+                offset,
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'sale',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: false,
+                    },
+                ],
+                order: [['id', 'DESC']],
+            };
+
+            const whereOpt: WhereOptions = {};
+            const orQueryWhereOpt: WhereOptions<orderAttributes> = {};
+
+            if (queryString) {
+                const arrCustomerId: number[] = [];
+                const findCustomer = await ismDb.customer.findAll({
+                    where: {
+                        [Op.or]: [
+                            { phoneNumber: { [Op.like]: `%${queryString.replace(/([\\%_])/, '\\$1')}%` } },
+                            { name: { [Op.like]: `%${queryString.replace(/([\\%_])/, '\\$1')}%` } },
+                        ],
+                    },
+                });
+
+                if (findCustomer.length > 0) {
+                    findCustomer.forEach((e) => {
+                        arrCustomerId.push(e.id);
+                    });
+
+                    orQueryWhereOpt['$order.customerId$'] = {
+                        [Op.in]: [arrCustomerId],
+                    };
+                }
+
+                orQueryWhereOpt['$order.invoiceNo$'] = {
+                    [Op.like]: `%${queryString.replace(/([\\%_])/, '\\$1')}%`,
+                };
+            }
+
+            if (saleId) {
+                await ismDb.user.findOne({
+                    where: {
+                        id: saleId,
+                        role: RoleList.sales,
+                    },
+                    rejectOnEmpty: new UserNotFoundError(),
+                });
+                whereOpt['$order.saleId$'] = {
+                    [Op.eq]: saleId,
+                };
+            }
+
+            if (createAt) {
+                whereOpt['$order.createdAt$'] = {
+                    [Op.between]: [createAt.startAt, createAt.endAt],
+                };
+            }
+
+            option.where = isEmpty(orQueryWhereOpt)
+                ? whereOpt
+                : {
+                      [Op.and]: whereOpt,
+                      [Op.or]: orQueryWhereOpt,
+                  };
+            const result = await ismDb.order.findAndCountAll(option);
+            return convertRDBRowsToConnection(result, offset, limitForLast);
+        },
     },
 
     Mutation: {
@@ -91,6 +184,39 @@ const order_resolver: IResolvers = {
                         ],
                     });
 
+                    const notificationForUsers = await ismDb.user.findAll({
+                        where: {
+                            role: [RoleList.sales, RoleList.admin, RoleList.director, RoleList.accountant],
+                        },
+                        attributes: ['id'],
+                    });
+
+                    const userIds = notificationForUsers.map((e) => e.id);
+
+                    const notificationAttribute: notificationCreationAttributes = {
+                        orderId: newOrder.id,
+                        event: NotificationEvent.NewOrder,
+                        content: `Đơn hàng ${invoiceNo} vừa được tạo mới`,
+                    };
+
+                    const notification: ismDb.notification = await ismDb.notification.create(notificationAttribute, { transaction: t });
+
+                    const userNotificationPromise: Promise<ismDb.userNotification>[] = [];
+
+                    userIds.forEach((userId) => {
+                        const userNotificationAttribute: userNotificationCreationAttributes = {
+                            userId,
+                            notificationId: notification.id,
+                            isRead: false,
+                        };
+
+                        const createUserNotification = ismDb.userNotification.create(userNotificationAttribute, { transaction: t });
+
+                        userNotificationPromise.push(createUserNotification);
+                    });
+
+                    await Promise.all(userNotificationPromise);
+
                     return newOrder;
                 } catch (error) {
                     await t.rollback();
@@ -123,6 +249,42 @@ const order_resolver: IResolvers = {
             return await sequelize.transaction(async (t: Transaction) => {
                 try {
                     await orderUpdate.save({ transaction: t });
+
+                    const notificationForUsers = await ismDb.user.findAll({
+                        where: {
+                            role: [RoleList.sales, RoleList.admin, RoleList.director, RoleList.accountant],
+                        },
+                        attributes: ['id'],
+                    });
+
+                    const userIds: number[] = [];
+                    notificationForUsers.forEach((e) => {
+                        userIds.push(e.id);
+                    });
+
+                    const notificationAttribute: notificationCreationAttributes = {
+                        orderId,
+                        event: NotificationEvent.OrderStatusChanged,
+                        content: `Hoá đơn ${orderUpdate.invoiceNo} vừa được sửa`,
+                    };
+
+                    const createNotification = await ismDb.notification.create(notificationAttribute, { transaction: t });
+
+                    const userNotificationPromise: Promise<ismDb.userNotification>[] = [];
+
+                    userIds.forEach((userId) => {
+                        const userNotificationAttribute: userNotificationCreationAttributes = {
+                            userId,
+                            notificationId: createNotification.id,
+                            isRead: false,
+                        };
+
+                        const createUserNotification = ismDb.userNotification.create(userNotificationAttribute, { transaction: t });
+
+                        userNotificationPromise.push(createUserNotification);
+                    });
+
+                    await Promise.all(userNotificationPromise);
 
                     return ISuccessResponse.Success;
                 } catch (error) {

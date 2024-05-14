@@ -25,6 +25,8 @@ generates:
         Notification: ../db_models/mysql/init-models#notification
         UserNotification: ../db_models/mysql/init-models#userNotification
         Order: ../db_models/mysql/init-models#order
+        OrderEdge: ../db_models/mysql/order#OrderEdge
+        OrderConnection: ../db_models/mysql/order#OrderConnection
         PaymentInfor: ../db_models/mysql/init-models#paymentInfor
         ItemGroup: ../db_models/mysql/init-models#itemGroup
         OrderDetail: ../db_models/mysql/init-models#orderDetail

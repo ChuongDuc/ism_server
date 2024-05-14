@@ -9,6 +9,7 @@ import { ismDb } from '../../loader/mysql';
 import { fDateTimeForInvoiceNoDayMonYear } from '../../lib/utils/formatTime';
 import { extractFirstName } from '../../lib/utils/others';
 import { UserNotFoundError } from '../../lib/classes/graphqlErrors';
+import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface orderAttributes {
     id: number;
@@ -27,6 +28,9 @@ export type orderPk = 'id';
 export type orderId = order[orderPk];
 export type orderOptionalAttributes = 'id' | 'VAT' | 'freightPrice' | 'deliverAddress' | 'status' | 'createdAt' | 'updatedAt';
 export type orderCreationAttributes = Optional<orderAttributes, orderOptionalAttributes>;
+
+export type OrderEdge = TRDBEdge<order>;
+export type OrderConnection = TRDBConnection<order>;
 
 export class order extends Model<orderAttributes, orderCreationAttributes> implements orderAttributes {
     id!: number;

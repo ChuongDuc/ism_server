@@ -1,0 +1,20 @@
+query FilterAllOrder($input: FilterAllOrderInput!) {
+    filterAllOrder(input: $input) {
+        edges{
+            cursor
+            node{
+                id
+                customer{
+                    id
+                    name
+                }
+                sale{
+                    id
+                    userName
+                }
+                invoiceNo
+                status
+            }
+        }
+    }
+}

@@ -4,6 +4,7 @@ import { UserEdge, UserConnection } from '../db_models/mysql/user';
 import { CustomerEdge, CustomerConnection } from '../db_models/mysql/customer';
 import { InventoryEdge, InventoryConnection } from '../db_models/mysql/inventory';
 import { ProductEdge, ProductConnection } from '../db_models/mysql/product';
+import { OrderEdge, OrderConnection } from '../db_models/mysql/order';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -111,6 +112,13 @@ export type IDeleteProductByIdInput = {
 
 export type IDeleteUserInput = {
   ids: Array<Scalars['Int']['input']>;
+};
+
+export type IFilterAllOrderInput = {
+  args?: InputMaybe<IPaginationInput>;
+  createAt?: InputMaybe<IFilterDate>;
+  queryString?: InputMaybe<Scalars['String']['input']>;
+  saleId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type IImportFileExcelInventoryInput = {
@@ -318,6 +326,13 @@ export type IOrder = {
   updatedAt?: Maybe<Scalars['Date']['output']>;
 };
 
+export type IOrderConnection = {
+  __typename?: 'OrderConnection';
+  edges?: Maybe<Array<Maybe<IOrderEdge>>>;
+  pageInfo: IPageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type IOrderDetail = {
   __typename?: 'OrderDetail';
   createdAt?: Maybe<Scalars['Date']['output']>;
@@ -330,6 +345,12 @@ export type IOrderDetail = {
   totalWeight?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['Date']['output']>;
   weightProduct?: Maybe<Scalars['Float']['output']>;
+};
+
+export type IOrderEdge = {
+  __typename?: 'OrderEdge';
+  cursor: Scalars['String']['output'];
+  node?: Maybe<IOrder>;
 };
 
 export type IPageInfo = {
@@ -391,6 +412,7 @@ export type IProductEdge = {
 
 export type IQuery = {
   __typename?: 'Query';
+  filterAllOrder: IOrderConnection;
   getAllCategory: Array<Maybe<ICategory>>;
   listAllCustomer: ICustomerConnection;
   listAllInventory: IInventoryConnection;
@@ -399,6 +421,11 @@ export type IQuery = {
   me: IUser;
   productDetail: IProduct;
   users: IUserConnection;
+};
+
+
+export type IQueryFilterAllOrderArgs = {
+  input: IFilterAllOrderInput;
 };
 
 
@@ -587,6 +614,11 @@ export type IUsersInput = {
   searchQuery?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type IFilterDate = {
+  endAt: Scalars['Date']['input'];
+  startAt: Scalars['Date']['input'];
+};
+
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -673,6 +705,7 @@ export type IResolversTypes = {
   DeleteCustomerInput: IDeleteCustomerInput;
   DeleteProductByIdInput: IDeleteProductByIdInput;
   DeleteUserInput: IDeleteUserInput;
+  FilterAllOrderInput: IFilterAllOrderInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ImportFileExcelInventoryInput: IImportFileExcelInventoryInput;
   ImportFileExcelProductsInput: IImportFileExcelProductsInput;
@@ -690,7 +723,9 @@ export type IResolversTypes = {
   NotificationEvent: INotificationEvent;
   NotificationResponse: ResolverTypeWrapper<Omit<INotificationResponse, 'notification' | 'order'> & { notification?: Maybe<IResolversTypes['Notification']>, order?: Maybe<IResolversTypes['Order']> }>;
   Order: ResolverTypeWrapper<order>;
+  OrderConnection: ResolverTypeWrapper<OrderConnection>;
   OrderDetail: ResolverTypeWrapper<orderDetail>;
+  OrderEdge: ResolverTypeWrapper<OrderEdge>;
   PageInfo: ResolverTypeWrapper<IPageInfo>;
   PaginationInput: IPaginationInput;
   PaymentInfo: ResolverTypeWrapper<Omit<IPaymentInfo, 'customer' | 'order'> & { customer: IResolversTypes['Customer'], order: IResolversTypes['Order'] }>;
@@ -719,6 +754,7 @@ export type IResolversTypes = {
   UserLoginInput: IUserLoginInput;
   UserLoginResponse: ResolverTypeWrapper<Omit<IUserLoginResponse, 'user'> & { user: IResolversTypes['User'] }>;
   UsersInput: IUsersInput;
+  filterDate: IFilterDate;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -738,6 +774,7 @@ export type IResolversParentTypes = {
   DeleteCustomerInput: IDeleteCustomerInput;
   DeleteProductByIdInput: IDeleteProductByIdInput;
   DeleteUserInput: IDeleteUserInput;
+  FilterAllOrderInput: IFilterAllOrderInput;
   Float: Scalars['Float']['output'];
   ImportFileExcelInventoryInput: IImportFileExcelInventoryInput;
   ImportFileExcelProductsInput: IImportFileExcelProductsInput;
@@ -754,7 +791,9 @@ export type IResolversParentTypes = {
   Notification: notification;
   NotificationResponse: Omit<INotificationResponse, 'notification' | 'order'> & { notification?: Maybe<IResolversParentTypes['Notification']>, order?: Maybe<IResolversParentTypes['Order']> };
   Order: order;
+  OrderConnection: OrderConnection;
   OrderDetail: orderDetail;
+  OrderEdge: OrderEdge;
   PageInfo: IPageInfo;
   PaginationInput: IPaginationInput;
   PaymentInfo: Omit<IPaymentInfo, 'customer' | 'order'> & { customer: IResolversParentTypes['Customer'], order: IResolversParentTypes['Order'] };
@@ -779,6 +818,7 @@ export type IResolversParentTypes = {
   UserLoginInput: IUserLoginInput;
   UserLoginResponse: Omit<IUserLoginResponse, 'user'> & { user: IResolversParentTypes['User'] };
   UsersInput: IUsersInput;
+  filterDate: IFilterDate;
 };
 
 export type ICategoryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Category'] = IResolversParentTypes['Category']> = {
@@ -917,6 +957,13 @@ export type IOrderResolvers<ContextType = any, ParentType extends IResolversPare
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IOrderConnectionResolvers<ContextType = any, ParentType extends IResolversParentTypes['OrderConnection'] = IResolversParentTypes['OrderConnection']> = {
+  edges?: Resolver<Maybe<Array<Maybe<IResolversTypes['OrderEdge']>>>, ParentType, ContextType>;
+  pageInfo?: Resolver<IResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IOrderDetailResolvers<ContextType = any, ParentType extends IResolversParentTypes['OrderDetail'] = IResolversParentTypes['OrderDetail']> = {
   createdAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
   description?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
@@ -928,6 +975,12 @@ export type IOrderDetailResolvers<ContextType = any, ParentType extends IResolve
   totalWeight?: Resolver<Maybe<IResolversTypes['Float']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
   weightProduct?: Resolver<Maybe<IResolversTypes['Float']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IOrderEdgeResolvers<ContextType = any, ParentType extends IResolversParentTypes['OrderEdge'] = IResolversParentTypes['OrderEdge']> = {
+  cursor?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<Maybe<IResolversTypes['Order']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -978,6 +1031,7 @@ export type IProductEdgeResolvers<ContextType = any, ParentType extends IResolve
 };
 
 export type IQueryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']> = {
+  filterAllOrder?: Resolver<IResolversTypes['OrderConnection'], ParentType, ContextType, RequireFields<IQueryFilterAllOrderArgs, 'input'>>;
   getAllCategory?: Resolver<Array<Maybe<IResolversTypes['Category']>>, ParentType, ContextType>;
   listAllCustomer?: Resolver<IResolversTypes['CustomerConnection'], ParentType, ContextType, RequireFields<IQueryListAllCustomerArgs, 'input'>>;
   listAllInventory?: Resolver<IResolversTypes['InventoryConnection'], ParentType, ContextType, RequireFields<IQueryListAllInventoryArgs, 'input'>>;
@@ -1048,7 +1102,9 @@ export type IResolvers<ContextType = any> = {
   Notification?: INotificationResolvers<ContextType>;
   NotificationResponse?: INotificationResponseResolvers<ContextType>;
   Order?: IOrderResolvers<ContextType>;
+  OrderConnection?: IOrderConnectionResolvers<ContextType>;
   OrderDetail?: IOrderDetailResolvers<ContextType>;
+  OrderEdge?: IOrderEdgeResolvers<ContextType>;
   PageInfo?: IPageInfoResolvers<ContextType>;
   PaymentInfo?: IPaymentInfoResolvers<ContextType>;
   Product?: IProductResolvers<ContextType>;

@@ -148,4 +148,9 @@ export const variables = {
             saleUserId: 5,
         },
     },
+    filterAllOrder: {
+        input: {
+            queryString: '',
+        },
+    },
 };

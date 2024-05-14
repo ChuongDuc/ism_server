@@ -119,6 +119,12 @@ type Order {
     updatedAt: Date
 }
 
+type OrderConnection {
+    edges: [OrderEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
 type OrderDetail {
     createdAt: Date
     description: String
@@ -130,6 +136,11 @@ type OrderDetail {
     totalWeight: Float
     updatedAt: Date
     weightProduct: Float
+}
+
+type OrderEdge {
+    cursor: String!
+    node: Order
 }
 
 type PageInfo {
@@ -174,6 +185,7 @@ type ProductEdge {
 }
 
 type Query {
+    filterAllOrder(input: FilterAllOrderInput!): OrderConnection!
     getAllCategory: [Category]!
     listAllCustomer(input: ListAllCustomerInput!): CustomerConnection!
     listAllInventory(input: ListAllInventoryInput!): InventoryConnection!
@@ -326,6 +338,13 @@ input DeleteUserInput {
     ids: [Int!]!
 }
 
+input FilterAllOrderInput {
+    args: PaginationInput
+    createAt: filterDate
+    queryString: String
+    saleId: Int
+}
+
 input ImportFileExcelInventoryInput {
     fileExcelInventory: Upload!
     fileName: String!
@@ -434,4 +453,9 @@ input UsersInput {
     isActive: Boolean
     role: Role
     searchQuery: String
+}
+
+input filterDate {
+    endAt: Date!
+    startAt: Date!
 }
