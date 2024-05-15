@@ -153,4 +153,22 @@ export const variables = {
             queryString: '',
         },
     },
+    listUserNotification: {
+        input: {
+            userId: 1,
+            event: '',
+        },
+    },
+    listArrayUserNotification: {
+        input: {
+            userId: 1,
+            event: 'NewMessage',
+        },
+    },
+    updateStatusUserNotification: {
+        input: {
+            userNotificationIds: [],
+            isRead: true,
+        },
+    },
 };

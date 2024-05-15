@@ -24,6 +24,8 @@ generates:
         ProductConnection: ../db_models/mysql/product#ProductConnection
         Notification: ../db_models/mysql/init-models#notification
         UserNotification: ../db_models/mysql/init-models#userNotification
+        UserNotificationEdge: ../db_models/mysql/userNotification#UserNotificationEdge
+        UserNotificationConnection: ../db_models/mysql/userNotification#UserNotificationConnection
         Order: ../db_models/mysql/init-models#order
         OrderEdge: ../db_models/mysql/order#OrderEdge
         OrderConnection: ../db_models/mysql/order#OrderConnection

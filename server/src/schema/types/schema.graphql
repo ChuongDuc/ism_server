@@ -84,6 +84,7 @@ type Mutation {
     updateOrder(input: UpdateOrderInput!): SuccessResponse!
     updateProductById(input: UpdateProductByIdInput!): SuccessResponse!
     updateProductPriceById(input: UpdateProductPriceByIdInput!): SuccessResponse!
+    updateStatusUserNotification(input: UpdateStatusUserNotificationInput!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
 }
 
@@ -190,6 +191,8 @@ type Query {
     listAllCustomer(input: ListAllCustomerInput!): CustomerConnection!
     listAllInventory(input: ListAllInventoryInput!): InventoryConnection!
     listAllProducts(input: ListAllProductsInput!): ProductConnection!
+    listArrayUserNotification(input: ListArrayUserNotificationInput!): [UserNotification]!
+    listUserNotification(input: ListUserNotificationInput!): UserNotificationConnection!
     login(input: UserLoginInput!): UserLoginResponse!
     me: User!
     productDetail(input: ProductDetailInput!): Product!
@@ -230,6 +233,26 @@ type UserEdge {
 type UserLoginResponse {
     token: String!
     user: User!
+}
+
+type UserNotification {
+    createdAt: Date
+    idUserNotification: Int!
+    isRead: Boolean!
+    notification: Notification!
+    updatedAt: Date
+    user: User!
+}
+
+type UserNotificationConnection {
+    edges: [UserNotificationEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type UserNotificationEdge {
+    cursor: String!
+    node: UserNotification
 }
 
 enum NotificationEvent {
@@ -372,6 +395,17 @@ input ListAllProductsInput {
     unit: Unit
 }
 
+input ListArrayUserNotificationInput {
+    event: NotificationEvent
+    userId: Int!
+}
+
+input ListUserNotificationInput {
+    args: PaginationInput
+    event: NotificationEvent
+    userId: Int!
+}
+
 input PaginationInput {
     after: Cursor
     before: Cursor
@@ -426,6 +460,11 @@ input UpdateProductByIdInput {
 input UpdateProductPriceByIdInput {
     price: Float
     productId: [Int!]!
+}
+
+input UpdateStatusUserNotificationInput {
+    isRead: Boolean!
+    userNotificationIds: [Int!]!
 }
 
 input UpdateUserInput {
