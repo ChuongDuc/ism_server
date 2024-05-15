@@ -40,6 +40,7 @@ export enum ISM_ERROR_CODE {
      * pagination Error
      */
     InvalidPaginationArgument = 'InvalidPaginationArgument',
+    UserNotificationNotFound = 'UserNotificationNotFound',
 }
 
 export class AuthenticationError extends GraphQLError {
@@ -177,6 +178,16 @@ export class OrderNotFoundError extends GraphQLError {
         super(message || 'Hoá đơn không tồn tại', {
             extensions: {
                 code: ISM_ERROR_CODE.OrderNotFound,
+            },
+        });
+    }
+}
+
+export class UserNotificationNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Thông báo không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.UserNotificationNotFound,
             },
         });
     }

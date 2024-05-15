@@ -8,5 +8,17 @@ import * as productType from './product.graphql';
 import * as orderType from './order.graphql';
 import * as notificationType from './notification.graphql';
 import * as paymentInforType from './paymentInfor.graphql';
+import * as userNotification from './userNotification.graphql';
 
-export default [root, userType, customerType, inventoryType, categoryType, productType, orderType, notificationType, paymentInforType];
+export default [
+    root,
+    userType,
+    customerType,
+    inventoryType,
+    categoryType,
+    productType,
+    orderType,
+    notificationType,
+    paymentInforType,
+    userNotification,
+];

@@ -1,0 +1,51 @@
+query ListArrayUserNotification($input: ListArrayUserNotificationInput!) {
+    listArrayUserNotification(input: $input){
+        idUserNotification
+        user {
+            id
+            email
+        }
+        notification {
+            id
+            event
+            content
+            Order {
+                orderId
+                VAT
+                invoiceNo
+                deliverAddress
+                status
+                freightPrice
+                remainingPaymentMoney
+                totalMoney
+                sale {
+                    id
+                    fullName
+                    phoneNumber
+                }
+                customer {
+                    phoneNumber
+                    name
+                }
+                deliverOrderList {
+                    driver {
+                        id
+                        firstName
+                        lastName
+                        fullName
+                        phoneNumber
+                    }
+                }
+                paymentList {
+                    id
+                    money
+                    description
+                    updatedAt
+                }
+                createdAt
+                updatedAt
+            }
+        }
+        isRead
+    }
+}

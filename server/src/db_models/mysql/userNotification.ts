@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { notification, notificationId } from './notification';
 import type { user, userId } from './user';
+import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface userNotificationAttributes {
     id: number;
@@ -16,6 +17,9 @@ export type userNotificationPk = 'id';
 export type userNotificationId = userNotification[userNotificationPk];
 export type userNotificationOptionalAttributes = 'id' | 'createdAt' | 'updatedAt';
 export type userNotificationCreationAttributes = Optional<userNotificationAttributes, userNotificationOptionalAttributes>;
+
+export type UserNotificationEdge = TRDBEdge<userNotification>;
+export type UserNotificationConnection = TRDBConnection<userNotification>;
 
 export class userNotification extends Model<userNotificationAttributes, userNotificationCreationAttributes> implements userNotificationAttributes {
     id!: number;

@@ -29,6 +29,8 @@ const prettifyJsonString = (variable: any) => JSON.stringify(variable, null, 2);
 //
 // const getMessage = importGraphqlString('./subscription/getMessage.graphql');
 
+// Mutations
+
 const login = importGraphqlString('./queries/authentication/login.graphql');
 
 const me = importGraphqlString('./queries/user/me.graphql');
@@ -65,6 +67,10 @@ const createOrder = importGraphqlString('./mutations/order/createOrder.graphql')
 
 const updateOrder = importGraphqlString('./mutations/order/updateOrder.graphql');
 
+const updateStatusUserNotification = importGraphqlString('./mutations/userNotification/updateStatusUserNotification.graphql');
+
+// Queries
+
 const users = importGraphqlString('./queries/user/users.graphql');
 
 const listAllCustomer = importGraphqlString('./queries/customer/listAllCustomer.graphql');
@@ -76,6 +82,10 @@ const getAllCategory = importGraphqlString('./queries/category/getAllCategory.gr
 const listAllProducts = importGraphqlString('./queries/product/listAllProducts.graphql');
 
 const filterAllOrder = importGraphqlString('./queries/order/filterAllOrders.graphql');
+
+const listUserNotification = importGraphqlString('./queries/userNotification/listUserNotification.graphql');
+
+const listArrayUserNotification = importGraphqlString('./queries/userNotification/listArrayUserNotification.graphql');
 
 export const queryExample = async (path: string = defaultPath): Promise<Tab[]> => {
     const userAuth = await setUserAuthorization();
@@ -256,6 +266,27 @@ export const queryExample = async (path: string = defaultPath): Promise<Tab[]> =
             query: filterAllOrder,
             headers: userAuth,
             variables: prettifyJsonString(variables.filterAllOrder),
+        },
+        {
+            endpoint: path,
+            name: 'Danh sách thông báo của user',
+            query: listUserNotification,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.listUserNotification),
+        },
+        {
+            endpoint: path,
+            name: 'Sửa trạng thái thông báo',
+            query: updateStatusUserNotification,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.updateStatusUserNotification),
+        },
+        {
+            endpoint: path,
+            name: 'Danh sách các thông báo của user',
+            query: listArrayUserNotification,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.listArrayUserNotification),
         },
     ];
 };

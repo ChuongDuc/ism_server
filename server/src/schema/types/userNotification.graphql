@@ -1,0 +1,45 @@
+ extend type Query {
+     listUserNotification(input: ListUserNotificationInput!): UserNotificationConnection!
+     listArrayUserNotification(input: ListArrayUserNotificationInput!): [UserNotification]!
+ }
+
+ extend type Mutation {
+     updateStatusUserNotification(input: UpdateStatusUserNotificationInput!): SuccessResponse!
+ }
+
+ type UserNotification {
+     idUserNotification:Int!
+     user: User!
+     notification: Notification!
+     isRead: Boolean!
+     createdAt: Date
+     updatedAt: Date
+ }
+
+ type UserNotificationConnection{
+     edges: [UserNotificationEdge]
+     pageInfo: PageInfo!
+     totalCount: Int!
+ }
+
+ type UserNotificationEdge {
+     cursor: String!
+     node: UserNotification
+ }
+
+ input ListUserNotificationInput{
+     userId: Int!
+     event: NotificationEvent
+     args: PaginationInput
+ }
+
+ input ListArrayUserNotificationInput{
+     userId: Int!
+     event: NotificationEvent
+ }
+
+ input UpdateStatusUserNotificationInput {
+     userNotificationIds: [Int!]!
+     isRead: Boolean!
+ }
+

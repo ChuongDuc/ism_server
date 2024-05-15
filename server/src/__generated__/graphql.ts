@@ -4,6 +4,7 @@ import { UserEdge, UserConnection } from '../db_models/mysql/user';
 import { CustomerEdge, CustomerConnection } from '../db_models/mysql/customer';
 import { InventoryEdge, InventoryConnection } from '../db_models/mysql/inventory';
 import { ProductEdge, ProductConnection } from '../db_models/mysql/product';
+import { UserNotificationEdge, UserNotificationConnection } from '../db_models/mysql/userNotification';
 import { OrderEdge, OrderConnection } from '../db_models/mysql/order';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -184,6 +185,17 @@ export type IListAllProductsInput = {
   unit?: InputMaybe<IUnit>;
 };
 
+export type IListArrayUserNotificationInput = {
+  event?: InputMaybe<INotificationEvent>;
+  userId: Scalars['Int']['input'];
+};
+
+export type IListUserNotificationInput = {
+  args?: InputMaybe<IPaginationInput>;
+  event?: InputMaybe<INotificationEvent>;
+  userId: Scalars['Int']['input'];
+};
+
 export type IMutation = {
   __typename?: 'Mutation';
   createCategory: ICategory;
@@ -201,6 +213,7 @@ export type IMutation = {
   updateOrder: ISuccessResponse;
   updateProductById: ISuccessResponse;
   updateProductPriceById: ISuccessResponse;
+  updateStatusUserNotification: ISuccessResponse;
   updateUser: ISuccessResponse;
 };
 
@@ -277,6 +290,11 @@ export type IMutationUpdateProductByIdArgs = {
 
 export type IMutationUpdateProductPriceByIdArgs = {
   input: IUpdateProductPriceByIdInput;
+};
+
+
+export type IMutationUpdateStatusUserNotificationArgs = {
+  input: IUpdateStatusUserNotificationInput;
 };
 
 
@@ -417,6 +435,8 @@ export type IQuery = {
   listAllCustomer: ICustomerConnection;
   listAllInventory: IInventoryConnection;
   listAllProducts: IProductConnection;
+  listArrayUserNotification: Array<Maybe<IUserNotification>>;
+  listUserNotification: IUserNotificationConnection;
   login: IUserLoginResponse;
   me: IUser;
   productDetail: IProduct;
@@ -441,6 +461,16 @@ export type IQueryListAllInventoryArgs = {
 
 export type IQueryListAllProductsArgs = {
   input: IListAllProductsInput;
+};
+
+
+export type IQueryListArrayUserNotificationArgs = {
+  input: IListArrayUserNotificationInput;
+};
+
+
+export type IQueryListUserNotificationArgs = {
+  input: IListUserNotificationInput;
 };
 
 
@@ -551,6 +581,11 @@ export type IUpdateProductPriceByIdInput = {
   productId: Array<Scalars['Int']['input']>;
 };
 
+export type IUpdateStatusUserNotificationInput = {
+  isRead: Scalars['Boolean']['input'];
+  userNotificationIds: Array<Scalars['Int']['input']>;
+};
+
 export type IUpdateUserInput = {
   address?: InputMaybe<Scalars['String']['input']>;
   avatarURL?: InputMaybe<Scalars['Upload']['input']>;
@@ -605,6 +640,29 @@ export type IUserLoginResponse = {
   __typename?: 'UserLoginResponse';
   token: Scalars['String']['output'];
   user: IUser;
+};
+
+export type IUserNotification = {
+  __typename?: 'UserNotification';
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  idUserNotification: Scalars['Int']['output'];
+  isRead: Scalars['Boolean']['output'];
+  notification: INotification;
+  updatedAt?: Maybe<Scalars['Date']['output']>;
+  user: IUser;
+};
+
+export type IUserNotificationConnection = {
+  __typename?: 'UserNotificationConnection';
+  edges?: Maybe<Array<Maybe<IUserNotificationEdge>>>;
+  pageInfo: IPageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type IUserNotificationEdge = {
+  __typename?: 'UserNotificationEdge';
+  cursor: Scalars['String']['output'];
+  node?: Maybe<IUserNotification>;
 };
 
 export type IUsersInput = {
@@ -718,6 +776,8 @@ export type IResolversTypes = {
   ListAllCustomerInput: IListAllCustomerInput;
   ListAllInventoryInput: IListAllInventoryInput;
   ListAllProductsInput: IListAllProductsInput;
+  ListArrayUserNotificationInput: IListArrayUserNotificationInput;
+  ListUserNotificationInput: IListUserNotificationInput;
   Mutation: ResolverTypeWrapper<{}>;
   Notification: ResolverTypeWrapper<notification>;
   NotificationEvent: INotificationEvent;
@@ -746,6 +806,7 @@ export type IResolversTypes = {
   UpdateOrderInput: IUpdateOrderInput;
   UpdateProductByIdInput: IUpdateProductByIdInput;
   UpdateProductPriceByIdInput: IUpdateProductPriceByIdInput;
+  UpdateStatusUserNotificationInput: IUpdateStatusUserNotificationInput;
   UpdateUserInput: IUpdateUserInput;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
   User: ResolverTypeWrapper<user>;
@@ -753,6 +814,9 @@ export type IResolversTypes = {
   UserEdge: ResolverTypeWrapper<UserEdge>;
   UserLoginInput: IUserLoginInput;
   UserLoginResponse: ResolverTypeWrapper<Omit<IUserLoginResponse, 'user'> & { user: IResolversTypes['User'] }>;
+  UserNotification: ResolverTypeWrapper<userNotification>;
+  UserNotificationConnection: ResolverTypeWrapper<UserNotificationConnection>;
+  UserNotificationEdge: ResolverTypeWrapper<UserNotificationEdge>;
   UsersInput: IUsersInput;
   filterDate: IFilterDate;
 };
@@ -787,6 +851,8 @@ export type IResolversParentTypes = {
   ListAllCustomerInput: IListAllCustomerInput;
   ListAllInventoryInput: IListAllInventoryInput;
   ListAllProductsInput: IListAllProductsInput;
+  ListArrayUserNotificationInput: IListArrayUserNotificationInput;
+  ListUserNotificationInput: IListUserNotificationInput;
   Mutation: {};
   Notification: notification;
   NotificationResponse: Omit<INotificationResponse, 'notification' | 'order'> & { notification?: Maybe<IResolversParentTypes['Notification']>, order?: Maybe<IResolversParentTypes['Order']> };
@@ -810,6 +876,7 @@ export type IResolversParentTypes = {
   UpdateOrderInput: IUpdateOrderInput;
   UpdateProductByIdInput: IUpdateProductByIdInput;
   UpdateProductPriceByIdInput: IUpdateProductPriceByIdInput;
+  UpdateStatusUserNotificationInput: IUpdateStatusUserNotificationInput;
   UpdateUserInput: IUpdateUserInput;
   Upload: Scalars['Upload']['output'];
   User: user;
@@ -817,6 +884,9 @@ export type IResolversParentTypes = {
   UserEdge: UserEdge;
   UserLoginInput: IUserLoginInput;
   UserLoginResponse: Omit<IUserLoginResponse, 'user'> & { user: IResolversParentTypes['User'] };
+  UserNotification: userNotification;
+  UserNotificationConnection: UserNotificationConnection;
+  UserNotificationEdge: UserNotificationEdge;
   UsersInput: IUsersInput;
   filterDate: IFilterDate;
 };
@@ -919,6 +989,7 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   updateOrder?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateOrderArgs, 'input'>>;
   updateProductById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateProductByIdArgs, 'input'>>;
   updateProductPriceById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateProductPriceByIdArgs, 'input'>>;
+  updateStatusUserNotification?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateStatusUserNotificationArgs, 'input'>>;
   updateUser?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateUserArgs, 'input'>>;
 };
 
@@ -1036,6 +1107,8 @@ export type IQueryResolvers<ContextType = any, ParentType extends IResolversPare
   listAllCustomer?: Resolver<IResolversTypes['CustomerConnection'], ParentType, ContextType, RequireFields<IQueryListAllCustomerArgs, 'input'>>;
   listAllInventory?: Resolver<IResolversTypes['InventoryConnection'], ParentType, ContextType, RequireFields<IQueryListAllInventoryArgs, 'input'>>;
   listAllProducts?: Resolver<IResolversTypes['ProductConnection'], ParentType, ContextType, RequireFields<IQueryListAllProductsArgs, 'input'>>;
+  listArrayUserNotification?: Resolver<Array<Maybe<IResolversTypes['UserNotification']>>, ParentType, ContextType, RequireFields<IQueryListArrayUserNotificationArgs, 'input'>>;
+  listUserNotification?: Resolver<IResolversTypes['UserNotificationConnection'], ParentType, ContextType, RequireFields<IQueryListUserNotificationArgs, 'input'>>;
   login?: Resolver<IResolversTypes['UserLoginResponse'], ParentType, ContextType, RequireFields<IQueryLoginArgs, 'input'>>;
   me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
   productDetail?: Resolver<IResolversTypes['Product'], ParentType, ContextType, RequireFields<IQueryProductDetailArgs, 'input'>>;
@@ -1086,6 +1159,29 @@ export type IUserLoginResponseResolvers<ContextType = any, ParentType extends IR
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IUserNotificationResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserNotification'] = IResolversParentTypes['UserNotification']> = {
+  createdAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  idUserNotification?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  isRead?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
+  notification?: Resolver<IResolversTypes['Notification'], ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  user?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IUserNotificationConnectionResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserNotificationConnection'] = IResolversParentTypes['UserNotificationConnection']> = {
+  edges?: Resolver<Maybe<Array<Maybe<IResolversTypes['UserNotificationEdge']>>>, ParentType, ContextType>;
+  pageInfo?: Resolver<IResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IUserNotificationEdgeResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserNotificationEdge'] = IResolversParentTypes['UserNotificationEdge']> = {
+  cursor?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<Maybe<IResolversTypes['UserNotification']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IResolvers<ContextType = any> = {
   Category?: ICategoryResolvers<ContextType>;
   Cursor?: GraphQLScalarType;
@@ -1117,5 +1213,8 @@ export type IResolvers<ContextType = any> = {
   UserConnection?: IUserConnectionResolvers<ContextType>;
   UserEdge?: IUserEdgeResolvers<ContextType>;
   UserLoginResponse?: IUserLoginResponseResolvers<ContextType>;
+  UserNotification?: IUserNotificationResolvers<ContextType>;
+  UserNotificationConnection?: IUserNotificationConnectionResolvers<ContextType>;
+  UserNotificationEdge?: IUserNotificationEdgeResolvers<ContextType>;
 };
 
