@@ -73,6 +73,8 @@ const updateStatusUserNotification = importGraphqlString('./mutations/userNotifi
 
 const users = importGraphqlString('./queries/user/users.graphql');
 
+const getUserById = importGraphqlString('./queries/user/getUserById.graphql');
+
 const listAllCustomer = importGraphqlString('./queries/customer/listAllCustomer.graphql');
 
 const listAllInventory = importGraphqlString('./queries/inventory/listAllInventory.graphql');
@@ -113,6 +115,13 @@ export const queryExample = async (path: string = defaultPath): Promise<Tab[]> =
             name: 'Đăng nhập',
             query: login,
             variables: prettifyJsonString(variables.login),
+        },
+        {
+            endpoint: path,
+            name: 'User by id',
+            query: getUserById,
+            headers: userAuth,
+            variables: prettifyJsonString(variables.getUserById),
         },
         {
             endpoint: path,

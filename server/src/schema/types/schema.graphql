@@ -188,6 +188,7 @@ type ProductEdge {
 type Query {
     filterAllOrder(input: FilterAllOrderInput!): OrderConnection!
     getAllCategory: [Category]!
+    getUserById(userId: Int!): User!
     listAllCustomer(input: ListAllCustomerInput!): CustomerConnection!
     listAllInventory(input: ListAllInventoryInput!): InventoryConnection!
     listAllProducts(input: ListAllProductsInput!): ProductConnection!

@@ -11,6 +11,9 @@ export const variables = {
             password,
         },
     },
+    getUserById: {
+        userId: 5,
+    },
     createUser: {
         input: {
             userName: 'testUser1',

@@ -119,6 +119,13 @@ const user_resolver: IResolvers = {
             const result = await ismDb.user.findAndCountAll(option);
             return convertRDBRowsToConnection(result, offset, limitForLast);
         },
+
+        getUserById: async (_parent, { userId }, context: SmContext) => {
+            checkAuthentication(context);
+            return await ismDb.user.findByPk(userId, {
+                rejectOnEmpty: new UserNotFoundError('Người dùng không tồn tại'),
+            });
+        },
     },
     Mutation: {
         // Tạo người dùng mới

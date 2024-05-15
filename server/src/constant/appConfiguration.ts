@@ -37,10 +37,10 @@ export const database = {
 
 export const storageConfig = {
     minIO: {
-        domain: process.env.MINIO_DOMAIN || 'http://116.103.228.13/',
-        bucket: process.env.MINIO_BUCKET || 'dev-app',
+        domain: process.env.MINIO_DOMAIN || 'https://www.s3byq.cloud/',
+        bucket: process.env.MINIO_BUCKET || 'dev-team',
+        endPoint: process.env.MINIO_ENDPOINT || 'www.s3byq.cloud',
         region: process.env.MINIO_REGION || 'ap-northeast-1',
-        endPoint: process.env.MINIO_ENDPOINT || '116.103.228.13',
         port: parseInt(process.env.MINIO_PORT || '9001', 10),
         useSSL: process.env.MINIO_SSL === 'true',
         accessKey: process.env.MINIO_ACCESS || '',

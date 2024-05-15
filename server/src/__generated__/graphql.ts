@@ -432,6 +432,7 @@ export type IQuery = {
   __typename?: 'Query';
   filterAllOrder: IOrderConnection;
   getAllCategory: Array<Maybe<ICategory>>;
+  getUserById: IUser;
   listAllCustomer: ICustomerConnection;
   listAllInventory: IInventoryConnection;
   listAllProducts: IProductConnection;
@@ -446,6 +447,11 @@ export type IQuery = {
 
 export type IQueryFilterAllOrderArgs = {
   input: IFilterAllOrderInput;
+};
+
+
+export type IQueryGetUserByIdArgs = {
+  userId: Scalars['Int']['input'];
 };
 
 
@@ -1104,6 +1110,7 @@ export type IProductEdgeResolvers<ContextType = any, ParentType extends IResolve
 export type IQueryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']> = {
   filterAllOrder?: Resolver<IResolversTypes['OrderConnection'], ParentType, ContextType, RequireFields<IQueryFilterAllOrderArgs, 'input'>>;
   getAllCategory?: Resolver<Array<Maybe<IResolversTypes['Category']>>, ParentType, ContextType>;
+  getUserById?: Resolver<IResolversTypes['User'], ParentType, ContextType, RequireFields<IQueryGetUserByIdArgs, 'userId'>>;
   listAllCustomer?: Resolver<IResolversTypes['CustomerConnection'], ParentType, ContextType, RequireFields<IQueryListAllCustomerArgs, 'input'>>;
   listAllInventory?: Resolver<IResolversTypes['InventoryConnection'], ParentType, ContextType, RequireFields<IQueryListAllInventoryArgs, 'input'>>;
   listAllProducts?: Resolver<IResolversTypes['ProductConnection'], ParentType, ContextType, RequireFields<IQueryListAllProductsArgs, 'input'>>;

@@ -4,6 +4,8 @@ extend type Query {
     login(input: UserLoginInput!): UserLoginResponse!
 
     users(input: UsersInput!): UserConnection!
+
+    getUserById(userId: Int!): User!
 }
 
 extend type Mutation {
@@ -114,6 +116,7 @@ input UsersInput {
     role: Role
     searchQuery: String
 }
+
 
 input SubscribeNotificationsInput {
     "excludingEvent: Khi user không muốn nhận thông từ 1 sự kiện nào đó"

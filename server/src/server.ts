@@ -24,6 +24,7 @@ import { syncDatabase } from './loader/mysql';
 import { appConfig } from './constant/appConfiguration';
 import { queryExample } from './playground';
 import PubSubService from './lib/classes/PubSubService';
+import MinIOServices from './lib/classes/MinIOServices';
 
 export interface SmContext {
     isAuth: boolean;
@@ -31,7 +32,7 @@ export interface SmContext {
     error: any;
     req: express.Request;
     res: express.Response;
-    // awsS3StorageService: AwsS3StorageService;
+    awsS3StorageService: MinIOServices;
     pubsub: PubSubService;
 }
 
