@@ -188,7 +188,7 @@ const user_resolver: IResolvers = {
                         console.log('createReadStream', filename);
                         const fileStream = createReadStream();
                         const filePath = `avatar/users/${newUser.id}/${filename}`;
-                        await minIOServices.upload(BucketValue.DEVAPP, filePath, fileStream, mimetype);
+                        await minIOServices.upload(BucketValue.DEVTEAM, filePath, fileStream, mimetype);
                         newUser.avatarURL = filePath;
                         await newUser.save({ transaction: t });
                     }
@@ -235,12 +235,12 @@ const user_resolver: IResolvers = {
             if (avatarURL) {
                 const { createReadStream, filename, mimetype } = await avatarURL.file;
                 if (user.avatarURL) {
-                    const deletedOldAvatar = minIOServices.deleteObjects([user.avatarURL], BucketValue.DEVAPP);
+                    const deletedOldAvatar = minIOServices.deleteObjects([user.avatarURL], BucketValue.DEVTEAM);
                     uploadAvatarProcess.push(deletedOldAvatar);
                 }
                 const fileStream = createReadStream();
                 const filePath = `avatar/users/${id}/${filename}`;
-                const uploadNewAvatar = minIOServices.upload(BucketValue.DEVAPP, filePath, fileStream, mimetype);
+                const uploadNewAvatar = minIOServices.upload(BucketValue.DEVTEAM, filePath, fileStream, mimetype);
                 user.avatarURL = filePath;
                 uploadAvatarProcess.push(uploadNewAvatar);
             }
