@@ -1,6 +1,9 @@
 export enum DefaultHashValue {
     saltRounds = 10,
 }
+
+export const defaultPwReset = 'demo1234';
+
 export enum RoleList {
     director = 999,
     admin = 99,

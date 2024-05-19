@@ -208,6 +208,7 @@ export type IMutation = {
   deleteUser: ISuccessResponse;
   importFileExcelInventory: Array<Maybe<IInventory>>;
   importFileExcelProducts: Array<Maybe<IProduct>>;
+  resetPassword: ISuccessResponse;
   updateCategory: ISuccessResponse;
   updateCustomer: ISuccessResponse;
   updateOrder: ISuccessResponse;
@@ -265,6 +266,11 @@ export type IMutationImportFileExcelInventoryArgs = {
 
 export type IMutationImportFileExcelProductsArgs = {
   input: IImportFileExcelProductsInput;
+};
+
+
+export type IMutationResetPasswordArgs = {
+  input: IResetPasswordInput;
 };
 
 
@@ -492,6 +498,10 @@ export type IQueryProductDetailArgs = {
 
 export type IQueryUsersArgs = {
   input: IUsersInput;
+};
+
+export type IResetPasswordInput = {
+  userId: Scalars['Int']['input'];
 };
 
 export enum IRole {
@@ -800,6 +810,7 @@ export type IResolversTypes = {
   ProductDetailInput: IProductDetailInput;
   ProductEdge: ResolverTypeWrapper<ProductEdge>;
   Query: ResolverTypeWrapper<{}>;
+  ResetPasswordInput: IResetPasswordInput;
   Role: IRole;
   StatusOrder: IStatusOrder;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -874,6 +885,7 @@ export type IResolversParentTypes = {
   ProductDetailInput: IProductDetailInput;
   ProductEdge: ProductEdge;
   Query: {};
+  ResetPasswordInput: IResetPasswordInput;
   String: Scalars['String']['output'];
   SubscribeNotificationsInput: ISubscribeNotificationsInput;
   Subscription: {};
@@ -990,6 +1002,7 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   deleteUser?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteUserArgs, 'input'>>;
   importFileExcelInventory?: Resolver<Array<Maybe<IResolversTypes['Inventory']>>, ParentType, ContextType, RequireFields<IMutationImportFileExcelInventoryArgs, 'input'>>;
   importFileExcelProducts?: Resolver<Array<Maybe<IResolversTypes['Product']>>, ParentType, ContextType, RequireFields<IMutationImportFileExcelProductsArgs, 'input'>>;
+  resetPassword?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationResetPasswordArgs, 'input'>>;
   updateCategory?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateCategoryArgs, 'input'>>;
   updateCustomer?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateCustomerArgs, 'input'>>;
   updateOrder?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateOrderArgs, 'input'>>;

@@ -79,6 +79,7 @@ type Mutation {
     deleteUser(input: DeleteUserInput!): SuccessResponse!
     importFileExcelInventory(input: ImportFileExcelInventoryInput!): [Inventory]!
     importFileExcelProducts(input: ImportFileExcelProductsInput!): [Product]!
+    resetPassword(input: ResetPasswordInput!): SuccessResponse!
     updateCategory(input: UpdateCategoryInput!): SuccessResponse!
     updateCustomer(input: UpdateCustomerInput!): SuccessResponse!
     updateOrder(input: UpdateOrderInput!): SuccessResponse!
@@ -416,6 +417,10 @@ input PaginationInput {
 
 input ProductDetailInput {
     id: Int!
+}
+
+input ResetPasswordInput {
+    userId: Int!
 }
 
 input SubscribeNotificationsInput {

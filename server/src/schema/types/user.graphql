@@ -9,6 +9,8 @@ extend type Query {
 }
 
 extend type Mutation {
+    resetPassword(input: ResetPasswordInput!): SuccessResponse!
+
     createUser(input: CreateUserInput!): User!
 
     updateUser(input: UpdateUserInput!): SuccessResponse!
@@ -50,6 +52,10 @@ type User {
 type UserLoginResponse {
     token: String!
     user: User!
+}
+
+input ResetPasswordInput {
+    userId: Int!
 }
 
 type UserConnection {

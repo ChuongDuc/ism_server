@@ -7,7 +7,7 @@ import { checkAuthentication } from '../../lib/utils/permision';
 import { MySQLError, PermissionError, UserAlreadyExistError, UserNotFoundError } from '../../lib/classes/graphqlErrors';
 import { generateJWT, USER_JWT } from '../../lib/utils/jwt';
 import { iNotificationEventToValueResolve, iRoleToNumber, roleNumberToIRole } from '../../lib/resolver_enum';
-import { BucketValue, DefaultHashValue, RoleList } from '../../lib/enum';
+import { BucketValue, DefaultHashValue, defaultPwReset, RoleList } from '../../lib/enum';
 import { userCreationAttributes } from '../../db_models/mysql/user';
 import { minIOServices, pubsubService } from '../../lib/classes';
 import { convertRDBRowsToConnection, getRDBPaginationParams, rdbConnectionResolver, rdbEdgeResolver } from '../../lib/utils/relay';
@@ -128,6 +128,20 @@ const user_resolver: IResolvers = {
         },
     },
     Mutation: {
+        resetPassword: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            if (context.user?.role !== RoleList.admin && context.user?.role !== RoleList.director && context.user?.role !== RoleList.manager) {
+                throw new PermissionError();
+            }
+            const { userId } = input;
+            const adminGoingUpdatePw = await ismDb.user.findByPk(userId, {
+                rejectOnEmpty: new UserNotFoundError(),
+            });
+            const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
+            adminGoingUpdatePw.password = bcrypt.hashSync(defaultPwReset, salt);
+            await adminGoingUpdatePw.save();
+            return ISuccessResponse.Success;
+        },
         // Tạo người dùng mới
         createUser: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
