@@ -56,7 +56,7 @@ const product_resolver: IResolvers = {
             }
 
             if (category) {
-                whereOpt.$category$ = {
+                whereOpt.$categoryId$ = {
                     [Op.eq]: category,
                 };
             }
@@ -77,7 +77,7 @@ const product_resolver: IResolvers = {
             checkAuthentication(context);
             const { fileExcelProducts } = input;
 
-            const { createReadStream, filename } = await fileExcelProducts;
+            const { createReadStream, filename } = await fileExcelProducts.file;
 
             return await sequelize.transaction(async (t: Transaction) => {
                 try {
@@ -131,7 +131,7 @@ const product_resolver: IResolvers = {
                         const createProductAttribute: productCreationAttributes = {
                             name: productData['Tên'],
                             weight: productData['Trọng lượng'],
-                            price: productData['Giá chưa VAT'],
+                            price: productData['Giá sản phẩm'],
                             height: productData['Độ dài'],
                             unit: productData['Đơn vị'] ?? undefined,
                             categoryId: Number(findCategory.id),

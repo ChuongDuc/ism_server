@@ -3,6 +3,8 @@ import { database } from '../constant/appConfiguration';
 import { initModels } from '../db_models/mysql/init-models';
 // eslint-disable-next-line import/extensions
 import user from '../dev_data/user.json';
+// eslint-disable-next-line import/extensions
+import inventory from '../dev_data/inventory.json';
 
 export const sequelize = new Sequelize(database.db_name, database.db_user, database.db_password, {
     ...database.option,
@@ -21,6 +23,7 @@ export const syncDatabase = async () => {
             .then(async () => {
                 if (isForceSync) {
                     await models.user.bulkCreate(user as any);
+                    await models.inventory.bulkCreate(inventory as any);
                 }
             })
             .catch((err) => {

@@ -69,7 +69,7 @@ const inventory_resolver: IResolvers = {
             checkAuthentication(context);
             const { fileExcelInventory, fileName } = input;
 
-            const { createReadStream, filename } = await fileExcelInventory;
+            const { createReadStream, filename } = await fileExcelInventory.file;
 
             const inventoryProcess: Promise<ismDb.inventory>[] = [];
             const pathFileExcel = '../../files/upload_excel/';
