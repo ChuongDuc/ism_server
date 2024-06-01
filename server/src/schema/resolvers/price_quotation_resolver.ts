@@ -150,6 +150,7 @@ const price_quotation_resolver: IResolvers = {
                                 quantity: element.quantity,
                                 priceProduct: element.priceProduct,
                                 description: element.description ?? undefined,
+                                weightProduct: element.weightProduct ?? undefined,
                             };
                             orderDetailPromise.push(ismDb.orderDetail.create(orderDetailAttribute, { transaction: t }));
                         });
@@ -377,6 +378,7 @@ const price_quotation_resolver: IResolvers = {
                                                         quantity: orderDetail.quantity ?? 0,
                                                         priceProduct: orderDetail.priceProduct ?? 0,
                                                         description: orderDetail.description ?? undefined,
+                                                        weightProduct: orderDetail.weightProduct ?? undefined,
                                                     };
                                                     allNewOrderDetailsIncoming.push(
                                                         ismDb.orderDetail.create(newOrderDetailAttribute, { transaction: t })
@@ -409,6 +411,7 @@ const price_quotation_resolver: IResolvers = {
                                         quantity: inputItem.quantity ?? 0,
                                         priceProduct: inputItem.priceProduct ?? 0,
                                         description: inputItem.description ?? undefined,
+                                        weightProduct: inputItem.weightProduct ?? undefined,
                                     };
                                     allNewOrderDetailsIncoming.push(ismDb.orderDetail.create(orderDetailAttribute, { transaction: t }));
                                 });

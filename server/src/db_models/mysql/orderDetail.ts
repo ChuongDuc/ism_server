@@ -14,6 +14,7 @@ export interface orderDetailAttributes {
     otherNote?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    weightProduct?: number;
 }
 
 export type orderDetailPk = 'id';
@@ -27,7 +28,8 @@ export type orderDetailOptionalAttributes =
     | 'deliveryMethodNote'
     | 'otherNote'
     | 'createdAt'
-    | 'updatedAt';
+    | 'updatedAt'
+    | 'weightProduct';
 export type orderDetailCreationAttributes = Optional<orderDetailAttributes, orderDetailOptionalAttributes>;
 
 export class orderDetail extends Model<orderDetailAttributes, orderDetailCreationAttributes> implements orderDetailAttributes {
@@ -50,6 +52,8 @@ export class orderDetail extends Model<orderDetailAttributes, orderDetailCreatio
     createdAt?: Date;
 
     updatedAt?: Date;
+
+    weightProduct?: number;
 
     // orderDetail belongsTo itemGroup via itemGroupId
     itemGroup!: itemGroup;
@@ -113,6 +117,10 @@ export class orderDetail extends Model<orderDetailAttributes, orderDetailCreatio
                 },
                 otherNote: {
                     type: DataTypes.STRING(300),
+                    allowNull: true,
+                },
+                weightProduct: {
+                    type: DataTypes.FLOAT,
                     allowNull: true,
                 },
             },

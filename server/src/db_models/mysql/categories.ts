@@ -23,7 +23,7 @@ export class categories extends Model<categoriesAttributes, categoriesCreationAt
 
     updatedAt?: Date;
 
-    // categories hasMany product via categoryId
+    // categories hasMany product via category
     products!: product[];
 
     getProducts!: Sequelize.HasManyGetAssociationsMixin<product>;
@@ -45,6 +45,29 @@ export class categories extends Model<categoriesAttributes, categoriesCreationAt
     hasProducts!: Sequelize.HasManyHasAssociationsMixin<product, productId>;
 
     countProducts!: Sequelize.HasManyCountAssociationsMixin;
+
+    // categories hasMany product via categoryId
+    category_products!: product[];
+
+    getCategory_products!: Sequelize.HasManyGetAssociationsMixin<product>;
+
+    setCategory_products!: Sequelize.HasManySetAssociationsMixin<product, productId>;
+
+    addCategory_product!: Sequelize.HasManyAddAssociationMixin<product, productId>;
+
+    addCategory_products!: Sequelize.HasManyAddAssociationsMixin<product, productId>;
+
+    createCategory_product!: Sequelize.HasManyCreateAssociationMixin<product>;
+
+    removeCategory_product!: Sequelize.HasManyRemoveAssociationMixin<product, productId>;
+
+    removeCategory_products!: Sequelize.HasManyRemoveAssociationsMixin<product, productId>;
+
+    hasCategory_product!: Sequelize.HasManyHasAssociationMixin<product, productId>;
+
+    hasCategory_products!: Sequelize.HasManyHasAssociationsMixin<product, productId>;
+
+    countCategory_products!: Sequelize.HasManyCountAssociationsMixin;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof categories {
         return categories.init(

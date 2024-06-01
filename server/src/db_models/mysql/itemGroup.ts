@@ -83,6 +83,10 @@ export class itemGroup extends Model<itemGroupAttributes, itemGroupCreationAttri
                     type: DataTypes.STRING(200),
                     allowNull: true,
                 },
+                name: {
+                    type: DataTypes.STRING(200),
+                    allowNull: true,
+                },
             },
             {
                 sequelize,
