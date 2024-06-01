@@ -38,3 +38,13 @@ export enum StatusOrder {
     paid = 'Đã thanh toán',
     done = 'Đơn hàng hoàn thành',
 }
+
+export enum TypeProduct {
+    shape = 'Thép hình',
+    plate = 'Thép tấm',
+}
+
+export enum formType {
+    VAT = 'Thuế VAT',
+    tonnage = 'Đơn trọng',
+}

@@ -6,5 +6,8 @@ import product from './product_resolver';
 import notification from './notification_resolver';
 import order from './order_resolver';
 import userNotification from './userNotificationResolver';
+import deliverOrder from './deliver_order_resolver';
+import priceQuotation from './price_quotation_resolver';
+import paymentInfor from './paymentInfor_resolver';
 
-export default [user, customer, inventory, category, product, notification, order, userNotification];
+export default [user, customer, inventory, category, product, notification, order, userNotification, deliverOrder, priceQuotation, paymentInfor];

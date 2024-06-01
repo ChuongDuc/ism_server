@@ -1,11 +1,15 @@
 extend type Query {
-    filterAllOrder(input: FilterAllOrderInput!): OrderConnection!
+    filterAllOrder(input: FilterAllOrderInput!): FilterAllOrdersResponse!
+
+    getOrderById(id: Int!): Order!
 }
 
 extend type Mutation {
     createOrder(input: CreateOrderInput!): Order!
 
     updateOrder(input: UpdateOrderInput!): SuccessResponse!
+
+    deleteOrder(input: DeleteOrderInput!): SuccessResponse!
 }
 
 enum StatusOrder {
@@ -32,17 +36,19 @@ type OrderEdge {
 
 input CreateOrderInput {
     customerId: Int!
-    saleUserId: Int!
+    saleId: Int!
     VAT: Float
+    discount: Float
 }
 
 input UpdateOrderInput {
     orderId: Int!
     customerId: Int
-    saleUserId: Int
+    saleId: Int
     VAT: Float
+    discount: Float
     status: StatusOrder
-    driverUserId: Int
+    driver: Int
 }
 
 type OrderDetail {
@@ -58,26 +64,25 @@ type OrderDetail {
     updatedAt: Date
 }
 
-type ItemGroup {
-    id: Int!
-    orderDetailList:[OrderDetail!]
-    name: String
-    description: String
-    createdAt: Date
-    updatedAt: Date
-}
-
 type Order {
     id: Int!
     customer: Customer!
     sale: User!
     invoiceNo: String!
     VAT: Float
+    discount: Float
     status: StatusOrder
+    driver: User
     freightPrice: Float
+    percentOfAdvancePayment: Float
+    reportingValidityAmount: Int
+    deliveryMethodDescription: String
+    executionTimeDescription: String
+    freightMessage: String
     deliverAddress: String
     itemGroupList: [ItemGroup]
-    paymentList: [PaymentInfo]
+    paymentList: [PaymentInfor]
+    deliverOrderList: [DeliverOrder]
     totalMoney: Float
     remainingPaymentMoney: Float
     createdAt: Date
@@ -86,6 +91,7 @@ type Order {
 
 input FilterAllOrderInput {
     queryString: String
+    status: StatusOrder
     saleId: Int
     createAt: filterDate
     args: PaginationInput
@@ -94,4 +100,25 @@ input FilterAllOrderInput {
 input filterDate{
     startAt: Date!
     endAt: Date!
+}
+
+type FilterAllOrdersResponse {
+    orders: OrderConnection
+    totalRevenue: Float
+    totalCompleted: Float
+    totalPaid: Float
+    totalDeliver: Float
+    allOrderCounter: Int!
+    creatNewOrderCounter: Int!
+    priceQuotationOrderCounter: Int!
+    createExportOrderCounter: Int!
+    deliveryOrderCounter: Int!
+    successDeliveryOrderCounter: Int!
+    paymentConfirmationOrderCounter: Int!
+    paidOrderCounter: Int!
+    doneOrderCounter: Int!
+}
+
+input  DeleteOrderInput {
+    orderId: Int!
 }

@@ -1,5 +1,5 @@
-import { INotificationEvent, IRole, IStatusOrder, IUnit } from '../__generated__/graphql';
-import { RoleList, StatusOrder, Unit } from './enum';
+import { IFormType, INotificationEvent, IRole, IStatusOrder, ITypeProduct, IUnit } from '../__generated__/graphql';
+import { formType, RoleList, StatusOrder, TypeProduct, Unit } from './enum';
 import { InValidRoleError, InValidValueError } from './classes/graphqlErrors';
 import { NotificationEvent } from './classes/PubSubService';
 
@@ -87,6 +87,7 @@ export const iUnitToUnit = (unitInput: IUnit) => {
     }
 };
 
+// eslint-disable-next-line consistent-return
 export const iNotificationEventToValueResolve = (event: INotificationEvent) => {
     // eslint-disable-next-line default-case
     switch (event) {
@@ -94,26 +95,26 @@ export const iNotificationEventToValueResolve = (event: INotificationEvent) => {
             return NotificationEvent.Common;
         case INotificationEvent.NewMessage:
             return NotificationEvent.NewMessage;
-        // case INotificationEvent.NewCustomer:
-        //     return NotificationEvent.NewCustomer;
+        case INotificationEvent.NewCustomer:
+            return NotificationEvent.NewCustomer;
         case INotificationEvent.NewOrder:
             return NotificationEvent.NewOrder;
         case INotificationEvent.OrderStatusChanged:
             return NotificationEvent.OrderStatusChanged;
-        // case INotificationEvent.NewProduct:
-        //     return NotificationEvent.NewProduct;
-        // case INotificationEvent.ProductUpdated:
-        //     return NotificationEvent.ProductUpdated;
-        // case INotificationEvent.Payment:
-        //     return NotificationEvent.Payment;
-        // case INotificationEvent.PaymentChanged:
-        //     return NotificationEvent.PaymentChanged;
-        // case INotificationEvent.NewDeliverResolver:
-        //     return NotificationEvent.NewDeliverResolver;
-        // case INotificationEvent.DeliverResolverUpdated:
-        //     return NotificationEvent.DeliverResolverUpdated;
-        // case INotificationEvent.DeliverResolverDelete:
-        //     return NotificationEvent.DeliverResolverDelete;
+        case INotificationEvent.NewProduct:
+            return NotificationEvent.NewProduct;
+        case INotificationEvent.ProductUpdated:
+            return NotificationEvent.ProductUpdated;
+        case INotificationEvent.Payment:
+            return NotificationEvent.Payment;
+        case INotificationEvent.PaymentChanged:
+            return NotificationEvent.PaymentChanged;
+        case INotificationEvent.NewDeliverResolver:
+            return NotificationEvent.NewDeliverResolver;
+        case INotificationEvent.DeliverResolverUpdated:
+            return NotificationEvent.DeliverResolverUpdated;
+        case INotificationEvent.DeliverResolverDelete:
+            return NotificationEvent.DeliverResolverDelete;
         // case INotificationEvent.NewVehicle:
         //     return NotificationEvent.NewVehicle;
         // case INotificationEvent.VehicleUpdated:
@@ -182,5 +183,49 @@ export const iStatusOrderToStatusOrder = (iStatusOrderInput: IStatusOrder) => {
             return StatusOrder.done;
         default:
             throw new InValidRoleError();
+    }
+};
+
+export const iTypeProductToTypeProduct = (input: ITypeProduct) => {
+    switch (input) {
+        case ITypeProduct.Shape:
+            return TypeProduct.shape;
+        case ITypeProduct.Plate:
+            return TypeProduct.plate;
+        default:
+            throw new InValidValueError();
+    }
+};
+
+export const typeProductITypeResolve = (input: ITypeProduct) => {
+    switch (input) {
+        case ITypeProduct.Shape:
+            return TypeProduct.shape;
+        case ITypeProduct.Plate:
+            return TypeProduct.plate;
+        default:
+            return TypeProduct.shape;
+    }
+};
+
+export const ITypeProductTypeResolve = (input: string) => {
+    switch (input) {
+        case TypeProduct.shape:
+            return ITypeProduct.Shape;
+        case TypeProduct.plate:
+            return ITypeProduct.Plate;
+        default:
+            throw new InValidValueError();
+    }
+};
+
+export const formTypeToIFormType = (formTypeString: string | undefined) => {
+    switch (formTypeString) {
+        case formType.VAT:
+            return IFormType.Vat;
+        case formType.tonnage:
+            return IFormType.Tonnage;
+        default:
+            throw new InValidValueError();
     }
 };

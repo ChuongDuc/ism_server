@@ -10,6 +10,14 @@ type Notification {
 enum NotificationEvent {
     Common
     NewMessage
+    NewCustomer
     NewOrder
     OrderStatusChanged
+    NewProduct
+    ProductUpdated
+    Payment
+    PaymentChanged
+    NewDeliverResolver
+    DeliverResolverUpdated
+    DeliverResolverDelete
 }

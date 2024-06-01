@@ -32,3 +32,6 @@ generates:
         PaymentInfor: ../db_models/mysql/init-models#paymentInfor
         ItemGroup: ../db_models/mysql/init-models#itemGroup
         OrderDetail: ../db_models/mysql/init-models#orderDetail
+        DeliverOrder: ../db_models/mysql/init-models#deliverOrder
+        DeliverOrderEdge: ../db_models/mysql/deliverOrder#DeliverOrderEdge
+        DeliverOrderConnection: ../db_models/mysql/deliverOrder#DeliverOrderConnection

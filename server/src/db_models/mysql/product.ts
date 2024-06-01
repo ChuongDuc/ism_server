@@ -6,13 +6,20 @@ import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface productAttributes {
     id: number;
-    categoryId: number;
     name: string;
     code?: string;
     price: number;
-    height: number;
+    priceWithVAT: number;
+    priceWithoutVAT: number;
     weight: number;
+    height: number;
+    width?: number;
+    available?: number;
+    category: number;
+    subCategory?: string;
     unit?: string;
+    type: string;
+    formType?: string;
     description?: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -20,7 +27,17 @@ export interface productAttributes {
 
 export type productPk = 'id';
 export type productId = product[productPk];
-export type productOptionalAttributes = 'id' | 'code' | 'unit' | 'description' | 'createdAt' | 'updatedAt';
+export type productOptionalAttributes =
+    | 'id'
+    | 'code'
+    | 'width'
+    | 'available'
+    | 'subCategory'
+    | 'unit'
+    | 'formType'
+    | 'description'
+    | 'createdAt'
+    | 'updatedAt';
 export type productCreationAttributes = Optional<productAttributes, productOptionalAttributes>;
 
 export type ProductEdge = TRDBEdge<product>;
@@ -29,19 +46,33 @@ export type ProductConnection = TRDBConnection<product>;
 export class product extends Model<productAttributes, productCreationAttributes> implements productAttributes {
     id!: number;
 
-    categoryId!: number;
-
     name!: string;
 
     code?: string;
 
     price!: number;
 
-    height!: number;
+    priceWithVAT!: number;
+
+    priceWithoutVAT!: number;
 
     weight!: number;
 
+    height!: number;
+
+    width?: number;
+
+    available?: number;
+
+    category!: number;
+
+    subCategory?: string;
+
     unit?: string;
+
+    type!: string;
+
+    formType?: string;
 
     description?: string;
 
@@ -50,9 +81,9 @@ export class product extends Model<productAttributes, productCreationAttributes>
     updatedAt?: Date;
 
     // product belongsTo categories via categoryId
-    category!: categories;
+    category_categoryProduct!: categories;
 
-    getCategory!: Sequelize.BelongsToGetAssociationMixin<categories>;
+    getCategory_categoryProduct!: Sequelize.BelongsToGetAssociationMixin<categories>;
 
     setCategory!: Sequelize.BelongsToSetAssociationMixin<categories, categoriesId>;
 
@@ -90,23 +121,27 @@ export class product extends Model<productAttributes, productCreationAttributes>
                     allowNull: false,
                     primaryKey: true,
                 },
-                categoryId: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                    references: {
-                        model: 'categories',
-                        key: 'id',
-                    },
-                },
                 name: {
-                    type: DataTypes.STRING(100),
+                    type: DataTypes.STRING(200),
                     allowNull: false,
                 },
                 code: {
-                    type: DataTypes.STRING(45),
+                    type: DataTypes.STRING(200),
                     allowNull: true,
                 },
                 price: {
+                    type: DataTypes.DECIMAL(15, 2),
+                    allowNull: false,
+                },
+                priceWithVAT: {
+                    type: DataTypes.DECIMAL(15, 2),
+                    allowNull: false,
+                },
+                priceWithoutVAT: {
+                    type: DataTypes.DECIMAL(15, 2),
+                    allowNull: false,
+                },
+                weight: {
                     type: DataTypes.FLOAT,
                     allowNull: false,
                 },
@@ -114,16 +149,40 @@ export class product extends Model<productAttributes, productCreationAttributes>
                     type: DataTypes.FLOAT,
                     allowNull: false,
                 },
-                weight: {
+                width: {
                     type: DataTypes.FLOAT,
+                    allowNull: true,
+                },
+                available: {
+                    type: DataTypes.FLOAT,
+                    allowNull: true,
+                },
+                category: {
+                    type: DataTypes.INTEGER,
                     allowNull: false,
+                    references: {
+                        model: 'categories',
+                        key: 'id',
+                    },
+                },
+                subCategory: {
+                    type: DataTypes.STRING(200),
+                    allowNull: true,
                 },
                 unit: {
                     type: DataTypes.STRING(200),
                     allowNull: true,
                 },
+                type: {
+                    type: DataTypes.STRING(200),
+                    allowNull: false,
+                },
+                formType: {
+                    type: DataTypes.STRING(200),
+                    allowNull: true,
+                },
                 description: {
-                    type: DataTypes.STRING(100),
+                    type: DataTypes.STRING(200),
                     allowNull: true,
                 },
             },
@@ -141,7 +200,7 @@ export class product extends Model<productAttributes, productCreationAttributes>
                     {
                         name: 'fk_product_1_idx',
                         using: 'BTREE',
-                        fields: [{ name: 'categoryId' }],
+                        fields: [{ name: 'category' }],
                     },
                 ],
             }

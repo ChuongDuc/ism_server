@@ -28,16 +28,32 @@ enum Unit {
     md
 }
 
+enum TypeProduct {
+    shape
+    plate
+}
+
+enum FormType {
+    VAT
+    tonnage
+}
+
 type Product {
     id: Int!
     name: String!
     code: String
     price: Float!
+    priceWithVAT: Float!
+    priceWithoutVAT: Float!
     weight: Float!
     height: Float!
     width: Float
+    available: Float
     category: Category!
+    subCategory: String
     unit: Unit
+    type: TypeProduct!
+    formType: FormType
     description: String
     createdAt: Date
     updatedAt: Date
@@ -63,22 +79,25 @@ input ListAllProductsInput {
     name: String
     unit: Unit
     category: Int
+    typeProduct: TypeProduct
     args: PaginationInput
 }
 
 input UpdateProductByIdInput {
     productId: Int!
-    name: String
+    productName: String
     weight: Float
     height: Float
-    price: Float
+    priceWithVAT: Float
+    priceWithoutVAT:Float
     categoryId: Int!
     unit: Unit
 }
 
 input UpdateProductPriceByIdInput {
     productId:[Int!]!
-    price: Float
+    priceWithVAT: Float
+    priceWithoutVAT:Float
 }
 
 input DeleteProductByIdInput {
@@ -87,13 +106,13 @@ input DeleteProductByIdInput {
 
 input CreateProductInput {
     productName: String!
-    code: String
-    price: Float!
+    priceWithVAT: Float!
+    priceWithoutVAT: Float!
     weight: Float!
     height: Float!
     categoryId: Int!
+    productType: TypeProduct!
     unit: Unit
-    description: String
 }
 
 input ProductDetailInput {

@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
+import type { deliverOrder, deliverOrderId } from './deliverOrder';
 import type { order, orderId } from './order';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 import { userNotification } from './init-models';
@@ -55,6 +56,29 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
     createdAt?: Date;
 
     updatedAt?: Date;
+
+    // user hasMany deliverOrder via driverId
+    deliverOrders!: deliverOrder[];
+
+    getDeliverOrders!: Sequelize.HasManyGetAssociationsMixin<deliverOrder>;
+
+    setDeliverOrders!: Sequelize.HasManySetAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    addDeliverOrder!: Sequelize.HasManyAddAssociationMixin<deliverOrder, deliverOrderId>;
+
+    addDeliverOrders!: Sequelize.HasManyAddAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    createDeliverOrder!: Sequelize.HasManyCreateAssociationMixin<deliverOrder>;
+
+    removeDeliverOrder!: Sequelize.HasManyRemoveAssociationMixin<deliverOrder, deliverOrderId>;
+
+    removeDeliverOrders!: Sequelize.HasManyRemoveAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    hasDeliverOrder!: Sequelize.HasManyHasAssociationMixin<deliverOrder, deliverOrderId>;
+
+    hasDeliverOrders!: Sequelize.HasManyHasAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    countDeliverOrders!: Sequelize.HasManyCountAssociationsMixin;
 
     // user hasMany order via saleId
     orders!: order[];

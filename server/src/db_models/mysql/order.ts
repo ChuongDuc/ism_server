@@ -1,15 +1,16 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Op, Optional } from 'sequelize';
 import type { customer, customerId } from './customer';
+import type { deliverOrder, deliverOrderId } from './deliverOrder';
 import type { itemGroup, itemGroupId } from './itemGroup';
 import type { notification, notificationId } from './notification';
 import type { paymentInfor, paymentInforId } from './paymentInfor';
 import type { user, userId } from './user';
 import { ismDb } from '../../loader/mysql';
 import { fDateTimeForInvoiceNoDayMonYear } from '../../lib/utils/formatTime';
-import { extractFirstName } from '../../lib/utils/others';
 import { UserNotFoundError } from '../../lib/classes/graphqlErrors';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
+import { extractFirstName } from '../../lib/utils/others';
 
 export interface orderAttributes {
     id: number;
@@ -17,16 +18,37 @@ export interface orderAttributes {
     saleId: number;
     invoiceNo: string;
     VAT?: number;
-    freightPrice?: number;
-    deliverAddress?: string;
+    discount?: number;
     status?: string;
+    driverId?: number;
+    freightPrice: number;
+    percentOfAdvancePayment?: number;
+    reportingValidityAmount?: number;
+    deliveryMethodDescription?: string;
+    executionTimeDescription?: string;
+    freightMessage?: string;
+    deliverAddress?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export type orderPk = 'id';
 export type orderId = order[orderPk];
-export type orderOptionalAttributes = 'id' | 'VAT' | 'freightPrice' | 'deliverAddress' | 'status' | 'createdAt' | 'updatedAt';
+export type orderOptionalAttributes =
+    | 'id'
+    | 'VAT'
+    | 'discount'
+    | 'status'
+    | 'driverId'
+    | 'freightPrice'
+    | 'percentOfAdvancePayment'
+    | 'reportingValidityAmount'
+    | 'deliveryMethodDescription'
+    | 'executionTimeDescription'
+    | 'freightMessage'
+    | 'deliverAddress'
+    | 'createdAt'
+    | 'updatedAt';
 export type orderCreationAttributes = Optional<orderAttributes, orderOptionalAttributes>;
 
 export type OrderEdge = TRDBEdge<order>;
@@ -43,13 +65,27 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
 
     VAT?: number;
 
-    freightPrice?: number;
-
-    deliverAddress?: string;
+    discount?: number;
 
     status?: string;
 
+    driverId?: number;
+
+    freightPrice!: number;
+
     totalMoney!: number;
+
+    percentOfAdvancePayment?: number;
+
+    reportingValidityAmount?: number;
+
+    deliveryMethodDescription?: string;
+
+    executionTimeDescription?: string;
+
+    freightMessage?: string;
+
+    deliverAddress?: string;
 
     remainingPaymentMoney!: number;
 
@@ -65,6 +101,29 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
     setCustomer!: Sequelize.BelongsToSetAssociationMixin<customer, customerId>;
 
     createCustomer!: Sequelize.BelongsToCreateAssociationMixin<customer>;
+
+    // order hasMany deliverOrder via orderId
+    deliverOrders!: deliverOrder[];
+
+    getDeliverOrders!: Sequelize.HasManyGetAssociationsMixin<deliverOrder>;
+
+    setDeliverOrders!: Sequelize.HasManySetAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    addDeliverOrder!: Sequelize.HasManyAddAssociationMixin<deliverOrder, deliverOrderId>;
+
+    addDeliverOrders!: Sequelize.HasManyAddAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    createDeliverOrder!: Sequelize.HasManyCreateAssociationMixin<deliverOrder>;
+
+    removeDeliverOrder!: Sequelize.HasManyRemoveAssociationMixin<deliverOrder, deliverOrderId>;
+
+    removeDeliverOrders!: Sequelize.HasManyRemoveAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    hasDeliverOrder!: Sequelize.HasManyHasAssociationMixin<deliverOrder, deliverOrderId>;
+
+    hasDeliverOrders!: Sequelize.HasManyHasAssociationsMixin<deliverOrder, deliverOrderId>;
+
+    countDeliverOrders!: Sequelize.HasManyCountAssociationsMixin;
 
     // order hasMany itemGroup via orderId
     itemGroups!: itemGroup[];
@@ -144,6 +203,15 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
 
     createSale!: Sequelize.BelongsToCreateAssociationMixin<user>;
 
+    // order belongsTo user via driverId
+    driver!: user;
+
+    getDriver!: Sequelize.BelongsToGetAssociationMixin<user>;
+
+    setDriver!: Sequelize.BelongsToSetAssociationMixin<user, userId>;
+
+    createDriver!: Sequelize.BelongsToCreateAssociationMixin<user>;
+
     async getTotalMoney(): Promise<number> {
         const itemGroups = this.itemGroups ?? (await this.getItemGroups());
         const orderDetails: ismDb.orderDetail[] = [];
@@ -155,19 +223,7 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
         }
 
         this.totalMoney = orderDetails.reduce(
-            (sum, odt) =>
-                sum +
-                (odt.productId
-                    ? parseFloat(String(odt.priceProduct)) *
-                      parseFloat(
-                          `${
-                              odt.totalWeight
-                                  ? odt.totalWeight
-                                  : parseFloat(`${odt.quantity ? odt.quantity : 0}`) *
-                                    parseFloat(odt.weightProduct ? String(odt.weightProduct) : String(odt.product.weight))
-                          }`
-                      )
-                    : 0.0),
+            (sum, odt) => sum + (odt.productId ? parseFloat(String(odt.quantity)) * parseFloat(String(odt.priceProduct)) : 0.0),
             0.0
         );
         return this.totalMoney;
@@ -186,8 +242,7 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
 
         this.remainingPaymentMoney =
             this.totalMoney +
-            (this.freightPrice ? parseFloat(String(this.freightPrice)) : 0.0) +
-            (this.VAT ? parseFloat(String((this.totalMoney * this.VAT) / 100)) : 0.0) -
+            (this.freightPrice ? parseFloat(String(this.freightPrice)) : 0.0) -
             oPayment.reduce((sum, opm) => sum + (opm.id ? parseFloat(String(opm.money)) : 0.0), 0.0);
 
         return this.remainingPaymentMoney;

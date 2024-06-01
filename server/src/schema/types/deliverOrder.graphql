@@ -1,0 +1,97 @@
+extend type Query {
+    listAllDeliverOrder(input: ListAllDeliverOrderInput!): ListAllDeliverOrderResponse!
+
+}
+
+extend type Mutation {
+    createDeliverOrder(input: CreateDeliverOrderInput!): DeliverOrder!
+
+    updateDeliverOrder(input: UpdateDeliverOrderInput!): SuccessResponse!
+
+    deleteDeliverOrders(input: DeleteDeliverOrdersInput!): SuccessResponse!
+
+}
+
+type ListAllDeliverOrderResponse{
+    deliverOrder: DeliverOrderConnection
+    allOrderCounter: Int!
+    creatNewOrderCounter: Int!
+    inProcessingCounter: Int!
+    doneOrderCounter: Int!
+}
+
+type DeliverOrder {
+    id: Int!
+    customer:Customer!
+    order: Order!
+    driver: User
+    deliveryDate: Date!
+    description: String
+    receivingNote: String
+    cranesNote: String
+    documentNote: String
+    otherNote: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+type DeliverOrderConnection {
+    edges: [DeliverOrderEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type DeliverOrderEdge{
+    cursor: String!
+    node: DeliverOrder
+}
+
+input OrderDetailNoteInput {
+    orderDetailId: Int!
+    deliveryMethodNote: String
+    otherNote: String
+}
+
+input ItemGroupsNoteInput {
+    itemGroupId: Int!
+    detailListInput: [OrderDetailNoteInput!]
+}
+
+input CreateDeliverOrderInput {
+    customerId:Int!
+    orderId: Int!
+    createById: Int!
+    driverId: Int
+    deliveryDate: Date!
+    description: String
+    receivingNote: String
+    cranesNote: String
+    documentNote: String
+    otherNote: String
+    itemGroupsNotes: [ItemGroupsNoteInput!]
+}
+
+input UpdateDeliverOrderInput {
+    deliverOrderId: Int!
+    driverId: Int
+    deliveryDate: Date
+    description: String
+    receivingNote: String
+    cranesNote: String
+    documentNote: String
+    otherNote: String
+    itemGroupsNotes: [ItemGroupsNoteInput!]
+}
+
+input DeleteDeliverOrdersInput {
+    ids: [Int!]!
+    deleteBy: Int!
+}
+
+input ListAllDeliverOrderInput{
+    driverId: Int
+    saleId: Int
+    queryString: String
+    status: String
+    args: PaginationInput
+}

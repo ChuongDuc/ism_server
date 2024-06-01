@@ -8,10 +8,10 @@ export interface orderDetailAttributes {
     itemGroupId: number;
     productId?: number;
     quantity?: number;
-    priceProduct?: number;
-    weightProduct?: number;
-    totalWeight?: number;
+    priceProduct: number;
     description?: string;
+    deliveryMethodNote?: string;
+    otherNote?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -23,9 +23,9 @@ export type orderDetailOptionalAttributes =
     | 'productId'
     | 'quantity'
     | 'priceProduct'
-    | 'weightProduct'
-    | 'totalWeight'
     | 'description'
+    | 'deliveryMethodNote'
+    | 'otherNote'
     | 'createdAt'
     | 'updatedAt';
 export type orderDetailCreationAttributes = Optional<orderDetailAttributes, orderDetailOptionalAttributes>;
@@ -39,13 +39,13 @@ export class orderDetail extends Model<orderDetailAttributes, orderDetailCreatio
 
     quantity?: number;
 
-    priceProduct?: number;
-
-    weightProduct?: number;
-
-    totalWeight?: number;
+    priceProduct!: number;
 
     description?: string;
+
+    deliveryMethodNote?: string;
+
+    otherNote?: string;
 
     createdAt?: Date;
 
@@ -95,23 +95,24 @@ export class orderDetail extends Model<orderDetailAttributes, orderDetailCreatio
                     },
                 },
                 quantity: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.FLOAT,
                     allowNull: true,
                 },
                 priceProduct: {
-                    type: DataTypes.DECIMAL(10, 0),
-                    allowNull: true,
-                },
-                weightProduct: {
-                    type: DataTypes.FLOAT,
-                    allowNull: true,
-                },
-                totalWeight: {
-                    type: DataTypes.FLOAT,
-                    allowNull: true,
+                    type: DataTypes.DECIMAL(15, 2),
+                    allowNull: false,
+                    defaultValue: 0.0,
                 },
                 description: {
-                    type: DataTypes.STRING(200),
+                    type: DataTypes.STRING(300),
+                    allowNull: true,
+                },
+                deliveryMethodNote: {
+                    type: DataTypes.STRING(300),
+                    allowNull: true,
+                },
+                otherNote: {
+                    type: DataTypes.STRING(300),
                     allowNull: true,
                 },
             },

@@ -6,6 +6,7 @@ import type { orderDetail, orderDetailId } from './orderDetail';
 export interface itemGroupAttributes {
     id: number;
     orderId: number;
+    name?: string;
     description?: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -13,13 +14,15 @@ export interface itemGroupAttributes {
 
 export type itemGroupPk = 'id';
 export type itemGroupId = itemGroup[itemGroupPk];
-export type itemGroupOptionalAttributes = 'id' | 'description' | 'createdAt' | 'updatedAt';
+export type itemGroupOptionalAttributes = 'id' | 'description' | 'createdAt' | 'updatedAt' | 'name';
 export type itemGroupCreationAttributes = Optional<itemGroupAttributes, itemGroupOptionalAttributes>;
 
 export class itemGroup extends Model<itemGroupAttributes, itemGroupCreationAttributes> implements itemGroupAttributes {
     id!: number;
 
     orderId!: number;
+
+    name?: string;
 
     description?: string;
 

@@ -9,9 +9,9 @@ export interface inventoryAttributes {
     quantity: number;
     weight?: number;
     unit?: string;
+    fileName: string;
     createdAt?: Date;
     updatedAt?: Date;
-    fileName: string;
 }
 
 export type inventoryPk = 'id';
@@ -35,11 +35,11 @@ export class inventory extends Model<inventoryAttributes, inventoryCreationAttri
 
     unit?: string;
 
+    fileName!: string;
+
     createdAt?: Date;
 
     updatedAt?: Date;
-
-    fileName!: string;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof inventory {
         return inventory.init(

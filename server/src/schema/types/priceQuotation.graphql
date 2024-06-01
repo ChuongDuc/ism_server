@@ -1,0 +1,87 @@
+extend type Mutation {
+    createPriceQuotation(input: CreatePriceQuotationInput!): [ItemGroup]!
+
+    updatePriceQuotation(input: UpdatePriceQuotationInput!): SuccessResponse!
+}
+
+type OrderDetail {
+    id: Int!
+    itemGroup: ItemGroup!
+    product: Product!
+    quantity: Float!
+    priceProduct: Float!
+    description: String
+    deliveryMethodNote: String
+    otherNote: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+type ItemGroup {
+    id: Int!
+    orderDetailList:[OrderDetail!]
+    name: String
+    description: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+input CategoryOrderInput {
+    products: [productInput!]!
+    name: String
+    description: String
+}
+
+input productInput {
+    productId: Int!
+    quantity: Int!
+    priceProduct: Float!
+    weightProduct: Float
+    totalWeight: Float
+    description: String
+}
+
+input CreatePriceQuotationInput{
+    orderId: Int!
+    saleId: Int!
+    categoryOrders: [CategoryOrderInput!]!
+    vat: Float
+    freightPrice: Float
+    percentOfAdvancePayment: Float
+    reportingValidityAmount: Int
+    deliveryMethodDescription: String
+    executionTimeDescription: String
+    freightMessage: String
+    deliverAddress: String
+}
+
+input UpdatePriceQuotationInput {
+    orderId: Int!
+    saleId: Int!
+    itemGroups: [ItemGroupsInput!]
+    vat: Float
+    freightPrice: Float
+    percentOfAdvancePayment: Float
+    reportingValidityAmount: Int
+    deliveryMethodDescription: String
+    executionTimeDescription: String
+    freightMessage: String
+    deliverAddress: String
+}
+
+input UpdateProductInput {
+    orderDetailId: Int
+    productId: Int!
+    quantity: Int
+    totalWeight: Float
+    weightProduct: Float
+    priceProduct: Float
+    description: String
+}
+
+input ItemGroupsInput {
+    itemGroupId: Int
+    orderDetails: [UpdateProductInput!]
+    description: String
+    name: String
+}

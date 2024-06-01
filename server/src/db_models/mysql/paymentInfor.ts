@@ -8,14 +8,14 @@ export interface paymentInforAttributes {
     orderId: number;
     customerId: number;
     money: number;
+    description?: string;
     createdAt?: Date;
     updatedAt?: Date;
-    description?: string;
 }
 
 export type paymentInforPk = 'id';
 export type paymentInforId = paymentInfor[paymentInforPk];
-export type paymentInforOptionalAttributes = 'id' | 'createdAt' | 'updatedAt' | 'description';
+export type paymentInforOptionalAttributes = 'id' | 'description' | 'createdAt' | 'updatedAt';
 export type paymentInforCreationAttributes = Optional<paymentInforAttributes, paymentInforOptionalAttributes>;
 
 export class paymentInfor extends Model<paymentInforAttributes, paymentInforCreationAttributes> implements paymentInforAttributes {
@@ -27,11 +27,11 @@ export class paymentInfor extends Model<paymentInforAttributes, paymentInforCrea
 
     money!: number;
 
+    description?: string;
+
     createdAt?: Date;
 
     updatedAt?: Date;
-
-    description?: string;
 
     // paymentInfor belongsTo customer via customerId
     customer!: customer;

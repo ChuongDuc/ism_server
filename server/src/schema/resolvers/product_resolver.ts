@@ -4,7 +4,14 @@ import { FindAndCountOptions, Op, Transaction, WhereOptions } from 'sequelize';
 import XLSX from 'xlsx';
 import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
 import { convertRDBRowsToConnection, getRDBPaginationParams, rdbConnectionResolver, rdbEdgeResolver } from '../../lib/utils/relay';
-import { iUnitToUnit, UnitStringToIUnit } from '../../lib/resolver_enum';
+import {
+    formTypeToIFormType,
+    iTypeProductToTypeProduct,
+    ITypeProductTypeResolve,
+    iUnitToUnit,
+    typeProductITypeResolve,
+    UnitStringToIUnit,
+} from '../../lib/resolver_enum';
 import { checkAuthentication } from '../../lib/utils/permision';
 import { SmContext } from '../../server';
 import { ismDb, sequelize } from '../../loader/mysql';
@@ -17,15 +24,19 @@ const product_resolver: IResolvers = {
     ProductConnection: rdbConnectionResolver,
 
     Product: {
+        formType: (parent) => (parent.formType ? formTypeToIFormType(parent.formType) : null),
+
         unit: (parent) => (parent.unit ? UnitStringToIUnit(parent.unit) : null),
 
-        category: async (parent) => parent.category ?? (await parent.getCategory()),
+        type: (parent) => ITypeProductTypeResolve(parent.type),
+
+        category: async (parent) => parent.category_categoryProduct ?? (await parent.getCategory_categoryProduct()),
     },
 
     Query: {
         listAllProducts: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            const { name, unit, category, args } = input;
+            const { name, unit, category, typeProduct, args } = input;
             const { limit, offset, limitForLast } = getRDBPaginationParams(args);
 
             const option: FindAndCountOptions = {
@@ -34,7 +45,7 @@ const product_resolver: IResolvers = {
                 include: [
                     {
                         model: ismDb.categories,
-                        as: 'category',
+                        as: 'category_categoryProduct',
                         required: true,
                     },
                 ],
@@ -56,8 +67,14 @@ const product_resolver: IResolvers = {
             }
 
             if (category) {
-                whereOpt.$categoryId$ = {
+                whereOpt.$category$ = {
                     [Op.eq]: category,
+                };
+            }
+
+            if (typeProduct) {
+                whereOpt.$type$ = {
+                    [Op.eq]: iTypeProductToTypeProduct(typeProduct),
                 };
             }
 
@@ -131,11 +148,18 @@ const product_resolver: IResolvers = {
                         const createProductAttribute: productCreationAttributes = {
                             name: productData['Tên'],
                             weight: productData['Trọng lượng'],
-                            price: productData['Giá sản phẩm'],
+                            price: productData['Giá chưa VAT'],
+                            priceWithoutVAT: productData['Giá chưa VAT'],
+                            priceWithVAT: productData['Giá có VAT'],
+                            formType: productData['Loại hình'] ?? undefined,
+                            width: productData['Chiều rộng'] ?? undefined,
                             height: productData['Độ dài'],
                             unit: productData['Đơn vị'] ?? undefined,
-                            categoryId: Number(findCategory.id),
+                            type: productData['Loại'],
+                            category: Number(findCategory.id),
+                            subCategory: productData['Danh mục phụ'] ?? undefined,
                             code: productData['Mã sản phẩm'] ?? undefined,
+                            available: productData['Tồn kho'] ?? undefined,
                             description: productData['Mô tả'] ?? undefined,
                         };
                         const newProduct = ismDb.product.create(createProductAttribute, { transaction: t });
@@ -154,7 +178,7 @@ const product_resolver: IResolvers = {
 
         updateProductPriceById: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            const { productId, price } = input;
+            const { productId, priceWithVAT, priceWithoutVAT } = input;
 
             const productArray = await ismDb.product.findAll({
                 where: {
@@ -168,15 +192,27 @@ const product_resolver: IResolvers = {
 
             return await sequelize.transaction(async (t: Transaction) => {
                 try {
-                    if (price) {
+                    if (priceWithoutVAT) {
                         const priceProductWithoutVAT: Promise<ismDb.product>[] = [];
 
                         productArray.forEach((e) => {
-                            e.price = price;
+                            e.priceWithoutVAT = priceWithoutVAT;
+                            e.price = priceWithoutVAT;
                             priceProductWithoutVAT.push(e.save({ transaction: t }));
                         });
 
                         if (priceProductWithoutVAT.length > 0) await Promise.all(priceProductWithoutVAT);
+                    }
+
+                    if (priceWithVAT) {
+                        const priceProductWithVAT: Promise<ismDb.product>[] = [];
+
+                        productArray.forEach((e) => {
+                            e.priceWithVAT = priceWithVAT;
+                            priceProductWithVAT.push(e.save({ transaction: t }));
+                        });
+
+                        if (priceProductWithVAT.length > 0) await Promise.all(priceProductWithVAT);
                     }
 
                     return ISuccessResponse.Success;
@@ -189,12 +225,12 @@ const product_resolver: IResolvers = {
 
         updateProductById: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            const { productId, name, height, weight, price, categoryId, unit } = input;
+            const { productId, productName, height, weight, priceWithVAT, priceWithoutVAT, categoryId, unit } = input;
 
             const productArray = await ismDb.product.findByPk(productId, { rejectOnEmpty: new ProductNotFoundError() });
 
-            if (name) {
-                productArray.name = name;
+            if (productName) {
+                productArray.name = productName;
             }
 
             if (height) {
@@ -205,12 +241,17 @@ const product_resolver: IResolvers = {
                 productArray.weight = weight;
             }
 
-            if (price) {
-                productArray.price = price;
+            if (priceWithVAT) {
+                productArray.priceWithVAT = priceWithVAT;
+            }
+
+            if (priceWithoutVAT) {
+                productArray.priceWithoutVAT = priceWithoutVAT;
+                productArray.price = priceWithoutVAT;
             }
 
             if (categoryId) {
-                productArray.categoryId = categoryId;
+                productArray.category = categoryId;
             }
 
             if (unit) {
@@ -253,7 +294,7 @@ const product_resolver: IResolvers = {
         createProduct: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
 
-            const { productName, height, weight, price, categoryId, unit, code, description } = input;
+            const { productName, height, productType, weight, priceWithVAT, priceWithoutVAT, categoryId, unit } = input;
 
             const productExist = await ismDb.product.findAll({
                 where: {
@@ -270,12 +311,13 @@ const product_resolver: IResolvers = {
             const productAttribute: productCreationAttributes = {
                 name: productName,
                 weight,
-                price,
+                price: priceWithoutVAT,
+                priceWithoutVAT,
+                priceWithVAT,
                 height,
-                categoryId,
-                code: code || undefined,
+                type: typeProductITypeResolve(productType),
+                category: categoryId,
                 unit: unit ? iUnitToUnit(unit) : undefined,
-                description: description || undefined,
             };
 
             return await ismDb.product.create(productAttribute);

@@ -5,13 +5,14 @@ import { iStatusOrderToStatusOrder, IStatusOrderTypeResolve } from '../../lib/re
 import { SmContext } from '../../server';
 import { RoleList, StatusOrder } from '../../lib/enum';
 import { checkAuthentication } from '../../lib/utils/permision';
-import { MySQLError, OrderNotFoundError, PermissionError, UserNotFoundError } from '../../lib/classes/graphqlErrors';
+import { MySQLError, OrderNotFoundError, PermissionError } from '../../lib/classes/graphqlErrors';
 import { ismDb, sequelize } from '../../loader/mysql';
-import { orderAttributes, orderCreationAttributes } from '../../db_models/mysql/order';
+import { orderCreationAttributes } from '../../db_models/mysql/order';
 import { convertRDBRowsToConnection, getRDBPaginationParams, rdbConnectionResolver, rdbEdgeResolver } from '../../lib/utils/relay';
 import { userNotificationCreationAttributes } from '../../db_models/mysql/userNotification';
 import { NotificationEvent } from '../../lib/classes/PubSubService';
 import { notificationCreationAttributes } from '../../db_models/mysql/notification';
+import { getNextNDayFromDate } from '../../lib/utils/formatTime';
 
 const order_resolver: IResolvers = {
     OrderEdge: rdbEdgeResolver,
@@ -23,11 +24,15 @@ const order_resolver: IResolvers = {
 
         sale: async (parent) => parent.sale ?? (await parent.getSale()),
 
+        driver: async (parent) => parent.driver ?? (await parent.getDriver()),
+
         status: (parent) => (parent.status ? IStatusOrderTypeResolve(parent.status) : null),
 
         itemGroupList: async (parent) => parent.itemGroups ?? (await parent.getItemGroups()),
 
         paymentList: async (parent) => parent.paymentInfors ?? (await parent.getPaymentInfors()),
+
+        deliverOrderList: async (parent) => parent.deliverOrders ?? (await parent.getDeliverOrders()),
 
         totalMoney: async (parent) => await parent.getTotalMoney(),
 
@@ -37,13 +42,28 @@ const order_resolver: IResolvers = {
     Query: {
         filterAllOrder: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            const { queryString, saleId, createAt, args } = input;
+            const { queryString, saleId, status, createAt, args } = input;
 
             const { limit, offset, limitForLast } = getRDBPaginationParams(args);
 
-            const option: FindAndCountOptions = {
-                limit,
-                offset,
+            const customerList =
+                queryString && queryString !== ''
+                    ? await ismDb.customer.findAll({
+                          attributes: ['id', 'name', 'phoneNumber', 'company'],
+                          // subQuery: false,
+                          where: {
+                              [Op.or]: [
+                                  { $phoneNumber$: { [Op.like]: `%${queryString}%` } },
+                                  { $name$: { [Op.like]: `%${queryString}%` } },
+                                  { $company$: { [Op.like]: `%${queryString}%` } },
+                              ],
+                          },
+                      })
+                    : [];
+
+            const customerIdsList = customerList.map((customer) => customer.id);
+
+            const commonOption: FindAndCountOptions = {
                 include: [
                     {
                         model: ismDb.user,
@@ -55,66 +75,198 @@ const order_resolver: IResolvers = {
                         as: 'customer',
                         required: false,
                     },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                                include: [
+                                    {
+                                        model: ismDb.product,
+                                        as: 'product',
+                                        required: false,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.paymentInfor,
+                        as: 'paymentInfors',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
                 ],
+                distinct: true,
                 order: [['id', 'DESC']],
             };
 
-            const whereOpt: WhereOptions = {};
-            const orQueryWhereOpt: WhereOptions<orderAttributes> = {};
+            const limitOption: FindAndCountOptions = {
+                ...commonOption,
+                limit,
+                offset,
+            };
+
+            const whereOpt: WhereOptions<ismDb.order> = {};
+            const whereOptNoStatus: WhereOptions<ismDb.order> = {};
+            const whereOptCustomer: WhereOptions<ismDb.customer> = {};
 
             if (queryString) {
-                const arrCustomerId: number[] = [];
-                const findCustomer = await ismDb.customer.findAll({
-                    where: {
-                        [Op.or]: [
-                            { phoneNumber: { [Op.like]: `%${queryString.replace(/([\\%_])/, '\\$1')}%` } },
-                            { name: { [Op.like]: `%${queryString.replace(/([\\%_])/, '\\$1')}%` } },
-                        ],
-                    },
-                });
-
-                if (findCustomer.length > 0) {
-                    findCustomer.forEach((e) => {
-                        arrCustomerId.push(e.id);
-                    });
-
-                    orQueryWhereOpt['$order.customerId$'] = {
-                        [Op.in]: [arrCustomerId],
-                    };
-                }
-
-                orQueryWhereOpt['$order.invoiceNo$'] = {
-                    [Op.like]: `%${queryString.replace(/([\\%_])/, '\\$1')}%`,
+                whereOptCustomer['$customer.id$'] = {
+                    [Op.in]: customerIdsList,
                 };
             }
 
             if (saleId) {
-                await ismDb.user.findOne({
-                    where: {
-                        id: saleId,
-                        role: RoleList.sales,
-                    },
-                    rejectOnEmpty: new UserNotFoundError(),
-                });
                 whereOpt['$order.saleId$'] = {
+                    [Op.eq]: saleId,
+                };
+                whereOptNoStatus['$order.saleId$'] = {
                     [Op.eq]: saleId,
                 };
             }
 
             if (createAt) {
                 whereOpt['$order.createdAt$'] = {
-                    [Op.between]: [createAt.startAt, createAt.endAt],
+                    [Op.between]: [createAt.startAt, getNextNDayFromDate(createAt.endAt, 1)],
+                };
+                whereOptNoStatus['$order.createdAt$'] = {
+                    [Op.between]: [createAt.startAt, getNextNDayFromDate(createAt.endAt, 1)],
                 };
             }
 
-            option.where = isEmpty(orQueryWhereOpt)
+            if (status) {
+                whereOpt['$order.status$'] = {
+                    [Op.eq]: iStatusOrderToStatusOrder(status),
+                };
+            }
+
+            limitOption.where = isEmpty(whereOptCustomer)
                 ? whereOpt
                 : {
                       [Op.and]: whereOpt,
-                      [Op.or]: orQueryWhereOpt,
+                      [Op.or]: whereOptCustomer,
                   };
-            const result = await ismDb.order.findAndCountAll(option);
-            return convertRDBRowsToConnection(result, offset, limitForLast);
+
+            const result = await ismDb.order.findAndCountAll(limitOption);
+
+            const orderConnection = convertRDBRowsToConnection(result, offset, limitForLast);
+
+            commonOption.where = isEmpty(whereOptCustomer)
+                ? whereOptNoStatus
+                : {
+                      [Op.and]: whereOptNoStatus,
+                      [Op.or]: whereOptCustomer,
+                  };
+
+            const allOrder = await ismDb.order.findAll(commonOption);
+
+            const totalOrderPromise = allOrder.map((order) => order.getTotalMoney());
+
+            await Promise.all(totalOrderPromise);
+
+            const totalRevenue = allOrder.reduce(
+                (sumRevenue, orderDetail) => sumRevenue + (orderDetail ? parseFloat(String(orderDetail.totalMoney)) : 0.0),
+                0.0
+            );
+            const allOrderCounter = allOrder.length;
+            const creatNewOrderCounter = allOrder.filter((e) => e.status === StatusOrder.creatNew).length;
+            const priceQuotationOrderCounter = allOrder.filter((e) => e.status === StatusOrder.priceQuotation).length;
+            const createExportOrderCounter = allOrder.filter((e) => e.status === StatusOrder.createExportOrder).length;
+            const successDeliveryOrderCounter = allOrder.filter((e) => e.status === StatusOrder.successDelivery).length;
+            const paymentConfirmationOrderCounter = allOrder.filter((e) => e.status === StatusOrder.paymentConfirmation).length;
+
+            const orderCompleted = allOrder.filter((e) => e.status === StatusOrder.done);
+            const doneOrderCounter = orderCompleted.length;
+            const totalCompleted = orderCompleted.reduce(
+                (sumCompleted, orderDetail) => sumCompleted + (orderDetail ? parseFloat(String(orderDetail.totalMoney)) : 0.0),
+                0.0
+            );
+            const orderPaid = allOrder.filter((e) => e.status === StatusOrder.paid);
+            const paidOrderCounter = orderPaid.length;
+            const totalPaid = orderPaid.reduce(
+                (sumPaid, orderDetail) => sumPaid + (orderDetail ? parseFloat(String(orderDetail.totalMoney)) : 0.0),
+                0.0
+            );
+            const orderDeliver = allOrder.filter((e) => e.status === StatusOrder.delivery);
+            const deliveryOrderCounter = orderDeliver.length;
+            const totalDeliver = orderDeliver.reduce(
+                (sumDeliver, orderDetail) => sumDeliver + (orderDetail ? parseFloat(String(orderDetail.totalMoney)) : 0.0),
+                0.0
+            );
+
+            return {
+                orders: orderConnection,
+                totalRevenue,
+                totalCompleted,
+                totalPaid,
+                totalDeliver,
+                allOrderCounter,
+                creatNewOrderCounter,
+                priceQuotationOrderCounter,
+                createExportOrderCounter,
+                deliveryOrderCounter,
+                successDeliveryOrderCounter,
+                paymentConfirmationOrderCounter,
+                paidOrderCounter,
+                doneOrderCounter,
+            };
+        },
+
+        getOrderById: async (_parent, { id }, context: SmContext) => {
+            checkAuthentication(context);
+            return await ismDb.order.findByPk(id, {
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'sale',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                                include: [
+                                    {
+                                        model: ismDb.product,
+                                        as: 'product',
+                                        required: false,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.paymentInfor,
+                        as: 'paymentInfors',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
+                ],
+                rejectOnEmpty: new OrderNotFoundError(),
+            });
         },
     },
 
@@ -129,17 +281,18 @@ const order_resolver: IResolvers = {
                 throw new PermissionError();
             }
 
-            const { customerId, saleUserId, VAT } = input;
+            const { customerId, saleId, VAT, discount } = input;
 
-            const invoiceNo = await ismDb.order.invoiceNoOrderName(saleUserId);
+            const invoiceNo = await ismDb.order.invoiceNoOrderName(saleId);
 
             return await sequelize.transaction(async (t: Transaction) => {
                 try {
                     const orderAttribute: orderCreationAttributes = {
                         customerId,
-                        saleId: saleUserId,
+                        saleId,
                         invoiceNo,
                         VAT: VAT ?? undefined,
+                        discount: discount ?? undefined,
                         status: StatusOrder.creatNew,
                         freightPrice: 0,
                     };
@@ -179,6 +332,11 @@ const order_resolver: IResolvers = {
                             {
                                 model: ismDb.paymentInfor,
                                 as: 'paymentInfors',
+                                required: false,
+                            },
+                            {
+                                model: ismDb.deliverOrder,
+                                as: 'deliverOrders',
                                 required: false,
                             },
                         ],
@@ -227,7 +385,7 @@ const order_resolver: IResolvers = {
 
         updateOrder: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            const { orderId, customerId, saleUserId, VAT, status } = input;
+            const { orderId, customerId, saleId, VAT, discount, status, driver } = input;
 
             const orderUpdate = await ismDb.order.findByPk(orderId, {
                 rejectOnEmpty: new OrderNotFoundError(),
@@ -236,14 +394,20 @@ const order_resolver: IResolvers = {
             if (customerId) {
                 orderUpdate.customerId = customerId;
             }
-            if (saleUserId) {
-                orderUpdate.saleId = saleUserId;
+            if (saleId) {
+                orderUpdate.saleId = saleId;
             }
             if (VAT) {
                 orderUpdate.VAT = VAT;
             }
+            if (discount) {
+                orderUpdate.discount = discount;
+            }
             if (status) {
                 orderUpdate.status = iStatusOrderToStatusOrder(status);
+            }
+            if (driver) {
+                orderUpdate.driverId = driver;
             }
 
             return await sequelize.transaction(async (t: Transaction) => {
@@ -290,6 +454,150 @@ const order_resolver: IResolvers = {
                 } catch (error) {
                     await t.rollback();
                     throw new MySQLError(`Cập nhật không thành công: ${error}`);
+                }
+            });
+        },
+
+        deleteOrder: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            if (context.user?.role !== RoleList.admin) {
+                throw new PermissionError();
+            }
+            const { orderId } = input;
+            const orderCurrent = await ismDb.order.findByPk(orderId, {
+                rejectOnEmpty: new OrderNotFoundError('Không tìm thấy thông tin đơn hàng'),
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'sale',
+                        required: true,
+                    },
+                ],
+            });
+            if (orderCurrent.status === StatusOrder.done) {
+                throw new PermissionError('Không thể xóa đơn hàng đã hoàn thành!');
+            }
+            // eslint-disable-next-line max-len
+            const contentMessage = `Đơn hàng ${orderCurrent.invoiceNo} của ${orderCurrent.sale.lastName} ${orderCurrent.sale.firstName} bị xoá bởi ${context.user?.lastName} ${context.user?.firstName}!`;
+
+            return await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    const itemGroups = await ismDb.itemGroup.findAll({
+                        transaction: t,
+                        where: {
+                            orderId,
+                        },
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                            },
+                        ],
+                    });
+                    const removeOrderDetail: Promise<number>[] = [];
+                    itemGroups.forEach((itg) => {
+                        const destroyOrderDetail = ismDb.orderDetail.destroy({
+                            transaction: t,
+                            where: {
+                                itemGroupId: itg.id,
+                            },
+                        });
+                        removeOrderDetail.push(destroyOrderDetail);
+                    });
+                    if (removeOrderDetail.length > 0) {
+                        await Promise.all(removeOrderDetail);
+                    }
+
+                    await ismDb.itemGroup.destroy({
+                        transaction: t,
+                        where: {
+                            orderId,
+                        },
+                    });
+
+                    const notifications = await ismDb.notification.findAll({
+                        transaction: t,
+                        where: {
+                            orderId,
+                        },
+                        include: [
+                            {
+                                model: ismDb.userNotification,
+                                as: 'userNotifications',
+                                required: false,
+                            },
+                        ],
+                    });
+                    const removeUserNotificationsProcess: Promise<number>[] = [];
+                    notifications.forEach((notification) => {
+                        const destroyUserNotification = ismDb.userNotification.destroy({
+                            transaction: t,
+                            where: {
+                                notificationId: notification.id,
+                            },
+                        });
+                        removeUserNotificationsProcess.push(destroyUserNotification);
+                    });
+                    if (removeUserNotificationsProcess.length > 0) {
+                        await Promise.all(removeUserNotificationsProcess);
+                    }
+
+                    await ismDb.notification.destroy({
+                        transaction: t,
+                        where: {
+                            orderId,
+                        },
+                    });
+
+                    await ismDb.paymentInfor.destroy({
+                        transaction: t,
+                        where: {
+                            orderId,
+                        },
+                    });
+
+                    const notificationForUsers = await ismDb.user.findAll({
+                        where: {
+                            role: [RoleList.sales, RoleList.admin, RoleList.director, RoleList.accountant],
+                            isActive: true,
+                        },
+                        attributes: ['id'],
+                    });
+
+                    const userIds = notificationForUsers.filter((us) => us.id !== context.user?.id).map((e) => e.id);
+
+                    const notificationAttribute: notificationCreationAttributes = {
+                        event: NotificationEvent.Common,
+                        content: contentMessage,
+                    };
+
+                    const notification: ismDb.notification = await ismDb.notification.create(notificationAttribute, { transaction: t });
+
+                    const userNotificationPromise: Promise<ismDb.userNotification>[] = [];
+
+                    userIds.forEach((userId) => {
+                        const userNotificationAttribute: userNotificationCreationAttributes = {
+                            userId,
+                            notificationId: notification.id,
+                            isRead: false,
+                        };
+
+                        const createUserNotification = ismDb.userNotification.create(userNotificationAttribute, { transaction: t });
+
+                        userNotificationPromise.push(createUserNotification);
+                    });
+
+                    if (userNotificationPromise.length > 0) {
+                        await Promise.all(userNotificationPromise);
+                    }
+
+                    await orderCurrent.destroy({ transaction: t });
+
+                    return ISuccessResponse.Success;
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError(`Xoá không thành công: ${error}`);
                 }
             });
         },

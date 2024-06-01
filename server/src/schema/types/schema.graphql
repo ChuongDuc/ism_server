@@ -36,6 +36,49 @@ type CustomerEdge {
     node: Customer
 }
 
+type DeliverOrder {
+    cranesNote: String
+    createdAt: Date
+    customer: Customer!
+    deliveryDate: Date!
+    description: String
+    documentNote: String
+    driver: User
+    id: Int!
+    order: Order!
+    otherNote: String
+    receivingNote: String
+    updatedAt: Date
+}
+
+type DeliverOrderConnection {
+    edges: [DeliverOrderEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type DeliverOrderEdge {
+    cursor: String!
+    node: DeliverOrder
+}
+
+type FilterAllOrdersResponse {
+    allOrderCounter: Int!
+    creatNewOrderCounter: Int!
+    createExportOrderCounter: Int!
+    deliveryOrderCounter: Int!
+    doneOrderCounter: Int!
+    orders: OrderConnection
+    paidOrderCounter: Int!
+    paymentConfirmationOrderCounter: Int!
+    priceQuotationOrderCounter: Int!
+    successDeliveryOrderCounter: Int!
+    totalCompleted: Float
+    totalDeliver: Float
+    totalPaid: Float
+    totalRevenue: Float
+}
+
 type Inventory {
     code: String!
     createdAt: Date
@@ -68,13 +111,27 @@ type ItemGroup {
     updatedAt: Date
 }
 
+type ListAllDeliverOrderResponse {
+    allOrderCounter: Int!
+    creatNewOrderCounter: Int!
+    deliverOrder: DeliverOrderConnection
+    doneOrderCounter: Int!
+    inProcessingCounter: Int!
+}
+
 type Mutation {
     createCategory(input: CreateCategoryInput!): Category!
     createCustomer(input: CreateCustomerInput!): Customer!
+    createDeliverOrder(input: CreateDeliverOrderInput!): DeliverOrder!
     createOrder(input: CreateOrderInput!): Order!
+    createPaymentInfo(input: CreatePaymentInforInput!): SuccessResponse!
+    createPriceQuotation(input: CreatePriceQuotationInput!): [ItemGroup]!
     createProduct(input: CreateProductInput!): Product!
     createUser(input: CreateUserInput!): User!
     deleteCustomer(input: DeleteCustomerInput!): SuccessResponse!
+    deleteDeliverOrders(input: DeleteDeliverOrdersInput!): SuccessResponse!
+    deleteOrder(input: DeleteOrderInput!): SuccessResponse!
+    deletePaymentInfo(input: DeletePaymentInforInput!): SuccessResponse!
     deleteProductById(input: DeleteProductByIdInput!): SuccessResponse!
     deleteUser(input: DeleteUserInput!): SuccessResponse!
     importFileExcelInventory(input: ImportFileExcelInventoryInput!): [Inventory]!
@@ -82,7 +139,10 @@ type Mutation {
     resetPassword(input: ResetPasswordInput!): SuccessResponse!
     updateCategory(input: UpdateCategoryInput!): SuccessResponse!
     updateCustomer(input: UpdateCustomerInput!): SuccessResponse!
+    updateDeliverOrder(input: UpdateDeliverOrderInput!): SuccessResponse!
     updateOrder(input: UpdateOrderInput!): SuccessResponse!
+    updatePaymentInfo(input: UpdatePaymentInforInput!): SuccessResponse!
+    updatePriceQuotation(input: UpdatePriceQuotationInput!): SuccessResponse!
     updateProductById(input: UpdateProductByIdInput!): SuccessResponse!
     updateProductPriceById(input: UpdateProductPriceByIdInput!): SuccessResponse!
     updateStatusUserNotification(input: UpdateStatusUserNotificationInput!): SuccessResponse!
@@ -109,12 +169,20 @@ type Order {
     createdAt: Date
     customer: Customer!
     deliverAddress: String
+    deliverOrderList: [DeliverOrder]
+    deliveryMethodDescription: String
+    discount: Float
+    driver: User
+    executionTimeDescription: String
+    freightMessage: String
     freightPrice: Float
     id: Int!
     invoiceNo: String!
     itemGroupList: [ItemGroup]
-    paymentList: [PaymentInfo]
+    paymentList: [PaymentInfor]
+    percentOfAdvancePayment: Float
     remainingPaymentMoney: Float
+    reportingValidityAmount: Int
     sale: User!
     status: StatusOrder
     totalMoney: Float
@@ -129,9 +197,11 @@ type OrderConnection {
 
 type OrderDetail {
     createdAt: Date
+    deliveryMethodNote: String
     description: String
     id: Int!
     itemGroup: ItemGroup!
+    otherNote: String
     priceProduct: Float!
     product: Product!
     quantity: Float!
@@ -150,7 +220,7 @@ type PageInfo {
     hasNextPage: Boolean!
 }
 
-type PaymentInfo {
+type PaymentInfor {
     createdAt: Date
     customer: Customer!
     description: String
@@ -161,14 +231,20 @@ type PaymentInfo {
 }
 
 type Product {
+    available: Float
     category: Category!
     code: String
     createdAt: Date
     description: String
+    formType: FormType
     height: Float!
     id: Int!
     name: String!
     price: Float!
+    priceWithVAT: Float!
+    priceWithoutVAT: Float!
+    subCategory: String
+    type: TypeProduct!
     unit: Unit
     updatedAt: Date
     weight: Float!
@@ -187,10 +263,12 @@ type ProductEdge {
 }
 
 type Query {
-    filterAllOrder(input: FilterAllOrderInput!): OrderConnection!
+    filterAllOrder(input: FilterAllOrderInput!): FilterAllOrdersResponse!
     getAllCategory: [Category]!
+    getOrderById(id: Int!): Order!
     getUserById(userId: Int!): User!
     listAllCustomer(input: ListAllCustomerInput!): CustomerConnection!
+    listAllDeliverOrder(input: ListAllDeliverOrderInput!): ListAllDeliverOrderResponse!
     listAllInventory(input: ListAllInventoryInput!): InventoryConnection!
     listAllProducts(input: ListAllProductsInput!): ProductConnection!
     listArrayUserNotification(input: ListArrayUserNotificationInput!): [UserNotification]!
@@ -257,11 +335,24 @@ type UserNotificationEdge {
     node: UserNotification
 }
 
+enum FormType {
+    VAT
+    tonnage
+}
+
 enum NotificationEvent {
     Common
+    DeliverResolverDelete
+    DeliverResolverUpdated
+    NewCustomer
+    NewDeliverResolver
     NewMessage
     NewOrder
+    NewProduct
     OrderStatusChanged
+    Payment
+    PaymentChanged
+    ProductUpdated
 }
 
 enum Role {
@@ -290,6 +381,11 @@ enum SuccessResponse {
     success
 }
 
+enum TypeProduct {
+    plate
+    shape
+}
+
 enum Unit {
     cai
     chiec
@@ -310,6 +406,12 @@ scalar JSON
 
 scalar Upload
 
+input CategoryOrderInput {
+    description: String
+    name: String
+    products: [productInput!]!
+}
+
 input CreateCategoryInput {
     name: String!
 }
@@ -322,19 +424,56 @@ input CreateCustomerInput {
     phoneNumber: String!
 }
 
+input CreateDeliverOrderInput {
+    cranesNote: String
+    createById: Int!
+    customerId: Int!
+    deliveryDate: Date!
+    description: String
+    documentNote: String
+    driverId: Int
+    itemGroupsNotes: [ItemGroupsNoteInput!]
+    orderId: Int!
+    otherNote: String
+    receivingNote: String
+}
+
 input CreateOrderInput {
     VAT: Float
     customerId: Int!
-    saleUserId: Int!
+    discount: Float
+    saleId: Int!
+}
+
+input CreatePaymentInforInput {
+    createById: Int!
+    customerId: Int!
+    description: String
+    money: Float!
+    orderId: Int!
+}
+
+input CreatePriceQuotationInput {
+    categoryOrders: [CategoryOrderInput!]!
+    deliverAddress: String
+    deliveryMethodDescription: String
+    executionTimeDescription: String
+    freightMessage: String
+    freightPrice: Float
+    orderId: Int!
+    percentOfAdvancePayment: Float
+    reportingValidityAmount: Int
+    saleId: Int!
+    vat: Float
 }
 
 input CreateProductInput {
     categoryId: Int!
-    code: String
-    description: String
     height: Float!
-    price: Float!
+    priceWithVAT: Float!
+    priceWithoutVAT: Float!
     productName: String!
+    productType: TypeProduct!
     unit: Unit
     weight: Float!
 }
@@ -355,6 +494,20 @@ input DeleteCustomerInput {
     ids: [Int!]!
 }
 
+input DeleteDeliverOrdersInput {
+    deleteBy: Int!
+    ids: [Int!]!
+}
+
+input DeleteOrderInput {
+    orderId: Int!
+}
+
+input DeletePaymentInforInput {
+    deleteBy: Int!
+    ids: [Int!]!
+}
+
 input DeleteProductByIdInput {
     productId: [Int!]!
 }
@@ -368,6 +521,7 @@ input FilterAllOrderInput {
     createAt: filterDate
     queryString: String
     saleId: Int
+    status: StatusOrder
 }
 
 input ImportFileExcelInventoryInput {
@@ -380,9 +534,29 @@ input ImportFileExcelProductsInput {
     fileExcelProducts: Upload!
 }
 
+input ItemGroupsInput {
+    description: String
+    itemGroupId: Int
+    name: String
+    orderDetails: [UpdateProductInput!]
+}
+
+input ItemGroupsNoteInput {
+    detailListInput: [OrderDetailNoteInput!]
+    itemGroupId: Int!
+}
+
 input ListAllCustomerInput {
     args: PaginationInput
     searchQuery: String
+}
+
+input ListAllDeliverOrderInput {
+    args: PaginationInput
+    driverId: Int
+    queryString: String
+    saleId: Int
+    status: String
 }
 
 input ListAllInventoryInput {
@@ -394,6 +568,7 @@ input ListAllProductsInput {
     args: PaginationInput
     category: Int
     name: String
+    typeProduct: TypeProduct
     unit: Unit
 }
 
@@ -406,6 +581,12 @@ input ListUserNotificationInput {
     args: PaginationInput
     event: NotificationEvent
     userId: Int!
+}
+
+input OrderDetailNoteInput {
+    deliveryMethodNote: String
+    orderDetailId: Int!
+    otherNote: String
 }
 
 input PaginationInput {
@@ -444,27 +625,75 @@ input UpdateCustomerInput {
     phoneNumber: String
 }
 
+input UpdateDeliverOrderInput {
+    cranesNote: String
+    deliverOrderId: Int!
+    deliveryDate: Date
+    description: String
+    documentNote: String
+    driverId: Int
+    itemGroupsNotes: [ItemGroupsNoteInput!]
+    otherNote: String
+    receivingNote: String
+}
+
 input UpdateOrderInput {
     VAT: Float
     customerId: Int
-    driverUserId: Int
+    discount: Float
+    driver: Int
     orderId: Int!
-    saleUserId: Int
+    saleId: Int
     status: StatusOrder
+}
+
+input UpdatePaymentInforInput {
+    customerId: Int
+    description: String
+    id: Int!
+    money: Float
+    orderId: Int
+    userId: Int!
+}
+
+input UpdatePriceQuotationInput {
+    deliverAddress: String
+    deliveryMethodDescription: String
+    executionTimeDescription: String
+    freightMessage: String
+    freightPrice: Float
+    itemGroups: [ItemGroupsInput!]
+    orderId: Int!
+    percentOfAdvancePayment: Float
+    reportingValidityAmount: Int
+    saleId: Int!
+    vat: Float
 }
 
 input UpdateProductByIdInput {
     categoryId: Int!
     height: Float
-    name: String
-    price: Float
+    priceWithVAT: Float
+    priceWithoutVAT: Float
     productId: Int!
+    productName: String
     unit: Unit
     weight: Float
 }
 
+input UpdateProductInput {
+    description: String
+    orderDetailId: Int
+    priceProduct: Float
+    productId: Int!
+    quantity: Int
+    totalWeight: Float
+    weightProduct: Float
+}
+
 input UpdateProductPriceByIdInput {
-    price: Float
+    priceWithVAT: Float
+    priceWithoutVAT: Float
     productId: [Int!]!
 }
 
@@ -503,4 +732,13 @@ input UsersInput {
 input filterDate {
     endAt: Date!
     startAt: Date!
+}
+
+input productInput {
+    description: String
+    priceProduct: Float!
+    productId: Int!
+    quantity: Int!
+    totalWeight: Float
+    weightProduct: Float
 }

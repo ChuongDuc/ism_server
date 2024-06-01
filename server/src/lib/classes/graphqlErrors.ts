@@ -41,6 +41,10 @@ export enum ISM_ERROR_CODE {
      */
     InvalidPaginationArgument = 'InvalidPaginationArgument',
     UserNotificationNotFound = 'UserNotificationNotFound',
+    DeliverOrderNotFound = 'DeliverOrderNotFound',
+    DuplicateCategoryProduct = 'DuplicateCategoryProduct',
+    EmptyValue = 'EmptyValue',
+    PaymentInfoNotFound = 'PaymentInfoNotFound Error',
 }
 
 export class AuthenticationError extends GraphQLError {
@@ -188,6 +192,46 @@ export class UserNotificationNotFoundError extends GraphQLError {
         super(message || 'Thông báo không tồn tại', {
             extensions: {
                 code: ISM_ERROR_CODE.UserNotificationNotFound,
+            },
+        });
+    }
+}
+
+export class DeliverOrderNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Lệnh xuất hàng không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.DeliverOrderNotFound,
+            },
+        });
+    }
+}
+
+export class DuplicateCategoryProductError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Tên hạng mục trong đơn hàng bị trùng', {
+            extensions: {
+                code: ISM_ERROR_CODE.DuplicateCategoryProduct,
+            },
+        });
+    }
+}
+
+export class EmptyValueError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Giá trị không được để trống!', {
+            extensions: {
+                code: ISM_ERROR_CODE.EmptyValue,
+            },
+        });
+    }
+}
+
+export class PaymentInfoNotFoundError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Thông tin thanh toán không tồn tại', {
+            extensions: {
+                code: ISM_ERROR_CODE.PaymentInfoNotFound,
             },
         });
     }
