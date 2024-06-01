@@ -25,104 +25,102 @@ import { userNotification as _userNotification } from './userNotification';
 import type { userNotificationAttributes, userNotificationCreationAttributes } from './userNotification';
 
 export {
-  _categories as categories,
-  _customer as customer,
-  _deliverOrder as deliverOrder,
-  _inventory as inventory,
-  _itemGroup as itemGroup,
-  _notification as notification,
-  _order as order,
-  _orderDetail as orderDetail,
-  _paymentInfor as paymentInfor,
-  _product as product,
-  _user as user,
-  _userNotification as userNotification,
+    _categories as categories,
+    _customer as customer,
+    _deliverOrder as deliverOrder,
+    _inventory as inventory,
+    _itemGroup as itemGroup,
+    _notification as notification,
+    _order as order,
+    _orderDetail as orderDetail,
+    _paymentInfor as paymentInfor,
+    _product as product,
+    _user as user,
+    _userNotification as userNotification,
 };
 
 export type {
-  categoriesAttributes,
-  categoriesCreationAttributes,
-  customerAttributes,
-  customerCreationAttributes,
-  deliverOrderAttributes,
-  deliverOrderCreationAttributes,
-  inventoryAttributes,
-  inventoryCreationAttributes,
-  itemGroupAttributes,
-  itemGroupCreationAttributes,
-  notificationAttributes,
-  notificationCreationAttributes,
-  orderAttributes,
-  orderCreationAttributes,
-  orderDetailAttributes,
-  orderDetailCreationAttributes,
-  paymentInforAttributes,
-  paymentInforCreationAttributes,
-  productAttributes,
-  productCreationAttributes,
-  userAttributes,
-  userCreationAttributes,
-  userNotificationAttributes,
-  userNotificationCreationAttributes,
+    categoriesAttributes,
+    categoriesCreationAttributes,
+    customerAttributes,
+    customerCreationAttributes,
+    deliverOrderAttributes,
+    deliverOrderCreationAttributes,
+    inventoryAttributes,
+    inventoryCreationAttributes,
+    itemGroupAttributes,
+    itemGroupCreationAttributes,
+    notificationAttributes,
+    notificationCreationAttributes,
+    orderAttributes,
+    orderCreationAttributes,
+    orderDetailAttributes,
+    orderDetailCreationAttributes,
+    paymentInforAttributes,
+    paymentInforCreationAttributes,
+    productAttributes,
+    productCreationAttributes,
+    userAttributes,
+    userCreationAttributes,
+    userNotificationAttributes,
+    userNotificationCreationAttributes,
 };
 
 export function initModels(sequelize: Sequelize) {
-  const categories = _categories.initModel(sequelize);
-  const customer = _customer.initModel(sequelize);
-  const deliverOrder = _deliverOrder.initModel(sequelize);
-  const inventory = _inventory.initModel(sequelize);
-  const itemGroup = _itemGroup.initModel(sequelize);
-  const notification = _notification.initModel(sequelize);
-  const order = _order.initModel(sequelize);
-  const orderDetail = _orderDetail.initModel(sequelize);
-  const paymentInfor = _paymentInfor.initModel(sequelize);
-  const product = _product.initModel(sequelize);
-  const user = _user.initModel(sequelize);
-  const userNotification = _userNotification.initModel(sequelize);
+    const categories = _categories.initModel(sequelize);
+    const customer = _customer.initModel(sequelize);
+    const deliverOrder = _deliverOrder.initModel(sequelize);
+    const inventory = _inventory.initModel(sequelize);
+    const itemGroup = _itemGroup.initModel(sequelize);
+    const notification = _notification.initModel(sequelize);
+    const order = _order.initModel(sequelize);
+    const orderDetail = _orderDetail.initModel(sequelize);
+    const paymentInfor = _paymentInfor.initModel(sequelize);
+    const product = _product.initModel(sequelize);
+    const user = _user.initModel(sequelize);
+    const userNotification = _userNotification.initModel(sequelize);
 
-  product.belongsTo(categories, { as: 'category_category', foreignKey: 'category'});
-  categories.hasMany(product, { as: 'products', foreignKey: 'category'});
-  product.belongsTo(categories, { as: 'category', foreignKey: 'categoryId'});
-  categories.hasMany(product, { as: 'category_products', foreignKey: 'categoryId'});
-  deliverOrder.belongsTo(customer, { as: 'customer', foreignKey: 'customerId'});
-  customer.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'customerId'});
-  order.belongsTo(customer, { as: 'customer', foreignKey: 'customerId'});
-  customer.hasMany(order, { as: 'orders', foreignKey: 'customerId'});
-  paymentInfor.belongsTo(customer, { as: 'customer', foreignKey: 'customerId'});
-  customer.hasMany(paymentInfor, { as: 'paymentInfors', foreignKey: 'customerId'});
-  orderDetail.belongsTo(itemGroup, { as: 'itemGroup', foreignKey: 'itemGroupId'});
-  itemGroup.hasMany(orderDetail, { as: 'orderDetails', foreignKey: 'itemGroupId'});
-  userNotification.belongsTo(notification, { as: 'notification', foreignKey: 'notificationId'});
-  notification.hasMany(userNotification, { as: 'userNotifications', foreignKey: 'notificationId'});
-  deliverOrder.belongsTo(order, { as: 'order', foreignKey: 'orderId'});
-  order.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'orderId'});
-  itemGroup.belongsTo(order, { as: 'order', foreignKey: 'orderId'});
-  order.hasMany(itemGroup, { as: 'itemGroups', foreignKey: 'orderId'});
-  notification.belongsTo(order, { as: 'order', foreignKey: 'orderId'});
-  order.hasMany(notification, { as: 'notifications', foreignKey: 'orderId'});
-  paymentInfor.belongsTo(order, { as: 'order', foreignKey: 'orderId'});
-  order.hasMany(paymentInfor, { as: 'paymentInfors', foreignKey: 'orderId'});
-  orderDetail.belongsTo(product, { as: 'product', foreignKey: 'productId'});
-  product.hasMany(orderDetail, { as: 'orderDetails', foreignKey: 'productId'});
-  deliverOrder.belongsTo(user, { as: 'driver', foreignKey: 'driverId'});
-  user.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'driverId'});
-  order.belongsTo(user, { as: 'sale', foreignKey: 'saleId'});
-  user.hasMany(order, { as: 'orders', foreignKey: 'saleId'});
-  userNotification.belongsTo(user, { as: 'user', foreignKey: 'userId'});
-  user.hasMany(userNotification, { as: 'userNotifications', foreignKey: 'userId'});
+    product.belongsTo(categories, { as: 'category_category', foreignKey: 'category' });
+    categories.hasMany(product, { as: 'products', foreignKey: 'category' });
+    deliverOrder.belongsTo(customer, { as: 'customer', foreignKey: 'customerId' });
+    customer.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'customerId' });
+    order.belongsTo(customer, { as: 'customer', foreignKey: 'customerId' });
+    customer.hasMany(order, { as: 'orders', foreignKey: 'customerId' });
+    paymentInfor.belongsTo(customer, { as: 'customer', foreignKey: 'customerId' });
+    customer.hasMany(paymentInfor, { as: 'paymentInfors', foreignKey: 'customerId' });
+    orderDetail.belongsTo(itemGroup, { as: 'itemGroup', foreignKey: 'itemGroupId' });
+    itemGroup.hasMany(orderDetail, { as: 'orderDetails', foreignKey: 'itemGroupId' });
+    userNotification.belongsTo(notification, { as: 'notification', foreignKey: 'notificationId' });
+    notification.hasMany(userNotification, { as: 'userNotifications', foreignKey: 'notificationId' });
+    deliverOrder.belongsTo(order, { as: 'order', foreignKey: 'orderId' });
+    order.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'orderId' });
+    itemGroup.belongsTo(order, { as: 'order', foreignKey: 'orderId' });
+    order.hasMany(itemGroup, { as: 'itemGroups', foreignKey: 'orderId' });
+    notification.belongsTo(order, { as: 'order', foreignKey: 'orderId' });
+    order.hasMany(notification, { as: 'notifications', foreignKey: 'orderId' });
+    paymentInfor.belongsTo(order, { as: 'order', foreignKey: 'orderId' });
+    order.hasMany(paymentInfor, { as: 'paymentInfors', foreignKey: 'orderId' });
+    orderDetail.belongsTo(product, { as: 'product', foreignKey: 'productId' });
+    product.hasMany(orderDetail, { as: 'orderDetails', foreignKey: 'productId' });
+    deliverOrder.belongsTo(user, { as: 'driver', foreignKey: 'driverId' });
+    user.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'driverId' });
+    order.belongsTo(user, { as: 'sale', foreignKey: 'saleId' });
+    user.hasMany(order, { as: 'orders', foreignKey: 'saleId' });
+    userNotification.belongsTo(user, { as: 'user', foreignKey: 'userId' });
+    user.hasMany(userNotification, { as: 'userNotifications', foreignKey: 'userId' });
 
-  return {
-    categories,
-    customer,
-    deliverOrder,
-    inventory,
-    itemGroup,
-    notification,
-    order,
-    orderDetail,
-    paymentInfor,
-    product,
-    user,
-    userNotification,
-  };
+    return {
+        categories,
+        customer,
+        deliverOrder,
+        inventory,
+        itemGroup,
+        notification,
+        order,
+        orderDetail,
+        paymentInfor,
+        product,
+        user,
+        userNotification,
+    };
 }
