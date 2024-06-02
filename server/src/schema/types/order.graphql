@@ -10,6 +10,10 @@ extend type Mutation {
     updateOrder(input: UpdateOrderInput!): SuccessResponse!
 
     deleteOrder(input: DeleteOrderInput!): SuccessResponse!
+
+    updateStatusOrderOfAccountant(input: UpdateStatusOrderOfAccountantInput!): SuccessResponse!
+
+    updateStatusOrderForDriver(input: UpdateStatusOrderForDriverInput!): SuccessResponse!
 }
 
 enum StatusOrder {
@@ -121,4 +125,29 @@ type FilterAllOrdersResponse {
 
 input  DeleteOrderInput {
     orderId: Int!
+}
+
+input UpdateStatusOrderOfAccountantInput {
+    orderId: Int!
+    userId: Int!
+    statusOrder: StatusOrder!
+    deliverOrder: [UpdateDeliverOrderNoteInput!]!
+}
+
+input UpdateStatusOrderForDriverInput {
+    orderId: Int!
+    userId: Int!
+    statusOrder: StatusOrder!
+    deliverOrder: [UpdateDeliverOrderNoteInput!]!
+}
+
+input UpdateDeliverOrderNoteInput {
+    deliverOrderId: Int!
+    receivingNote: String # Ghi chú hàng đã giao của lệnh xuất hàng
+    cranesNote: String # Ghi chú cẩu hàng
+    documentNote: String # Ghi chú Kèm chứng chỉ giấy tờ cửa Khách Hàng
+    otherNote: String # Dặn dò khác
+    receiver: String
+    receiverPhoneNumber: String
+    name: String
 }

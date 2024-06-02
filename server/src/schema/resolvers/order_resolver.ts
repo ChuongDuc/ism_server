@@ -1,6 +1,6 @@
 import { FindAndCountOptions, Op, Transaction, WhereOptions } from 'sequelize';
 import { isEmpty } from 'lodash';
-import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
+import { IResolvers, IStatusOrder, ISuccessResponse } from '../../__generated__/graphql';
 import { iStatusOrderToStatusOrder, IStatusOrderTypeResolve } from '../../lib/resolver_enum';
 import { SmContext } from '../../server';
 import { RoleList, StatusOrder } from '../../lib/enum';
@@ -598,6 +598,241 @@ const order_resolver: IResolvers = {
                 } catch (error) {
                     await t.rollback();
                     throw new MySQLError(`Xoá không thành công: ${error}`);
+                }
+            });
+        },
+
+        updateStatusOrderOfAccountant: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            if (context.user?.role !== RoleList.accountant) {
+                throw new PermissionError();
+            }
+            const { orderId, userId, statusOrder, deliverOrder } = input;
+
+            const order = await ismDb.order.findByPk(orderId, {
+                include: [
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
+                ],
+                rejectOnEmpty: new OrderNotFoundError(),
+            });
+
+            return await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    const updateDeliverOrderNote: Promise<ismDb.deliverOrder>[] = [];
+
+                    const originalDeliverOrder = order.deliverOrders;
+
+                    for (let n = 0; n < deliverOrder.length; n += 1) {
+                        for (let i = 0; i < originalDeliverOrder.length; i += 1) {
+                            if (originalDeliverOrder[i].id === deliverOrder[n].deliverOrderId) {
+                                if (deliverOrder[n].receivingNote) {
+                                    originalDeliverOrder[i].receivingNote = deliverOrder[n].receivingNote ?? originalDeliverOrder[i].receivingNote;
+                                }
+                                if (deliverOrder[n].cranesNote) {
+                                    originalDeliverOrder[i].cranesNote = deliverOrder[n].cranesNote ?? originalDeliverOrder[i].cranesNote;
+                                }
+                                if (deliverOrder[n].documentNote) {
+                                    originalDeliverOrder[i].documentNote = deliverOrder[n].documentNote ?? originalDeliverOrder[i].documentNote;
+                                }
+                                if (deliverOrder[n].otherNote) {
+                                    originalDeliverOrder[i].otherNote = deliverOrder[n].otherNote ?? originalDeliverOrder[i].otherNote;
+                                }
+
+                                updateDeliverOrderNote.push(originalDeliverOrder[i].save({ transaction: t }));
+                            }
+                        }
+                    }
+
+                    const notificationForUsers = await ismDb.user.findAll({
+                        where: {
+                            role: [RoleList.admin, RoleList.director, RoleList.accountant, RoleList.sales],
+                        },
+                        attributes: ['id'],
+                    });
+
+                    const ids = notificationForUsers.map((e) => e.id);
+                    const userIds = ids.filter((e) => e !== userId);
+
+                    if (order.driverId) userIds.push(order.driverId);
+
+                    const notificationAttribute: notificationCreationAttributes = {
+                        orderId,
+                        event: NotificationEvent.DeliverResolverUpdated,
+                        content: order.customer.name
+                            ? `Đơn hàng khách ${order.customer.name} vừa được ${iStatusOrderToStatusOrder(statusOrder)}`
+                            : `Đơn hàng ${order.invoiceNo} vừa được ${iStatusOrderToStatusOrder(statusOrder)}`,
+                    };
+
+                    const notification: ismDb.notification = await ismDb.notification.create(notificationAttribute, { transaction: t });
+
+                    const userNotificationPromise: Promise<ismDb.userNotification>[] = [];
+
+                    userIds.forEach((id) => {
+                        const userNotificationAttribute: userNotificationCreationAttributes = {
+                            userId: id,
+                            notificationId: notification.id,
+                            isRead: false,
+                        };
+
+                        const createUserNotification = ismDb.userNotification.create(userNotificationAttribute, { transaction: t });
+
+                        userNotificationPromise.push(createUserNotification);
+                    });
+
+                    await Promise.all(userNotificationPromise);
+
+                    order.status = iStatusOrderToStatusOrder(statusOrder);
+
+                    if (updateDeliverOrderNote.length > 0) await Promise.all(updateDeliverOrderNote);
+
+                    await order.save({ transaction: t });
+
+                    return ISuccessResponse.Success;
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError(`Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`);
+                }
+            });
+        },
+
+        updateStatusOrderForDriver: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            if (
+                context.user?.role !== RoleList.driver &&
+                context.user?.role !== RoleList.assistantDriver &&
+                context.user?.role !== RoleList.transporterManager
+            ) {
+                throw new PermissionError();
+            }
+            const { orderId, userId, statusOrder, deliverOrder } = input;
+
+            if (statusOrder !== IStatusOrder.SuccessDelivery && statusOrder !== IStatusOrder.Delivery) {
+                throw new PermissionError('Bạn không có quyền cập nhật trạng thái này cho đơn hàng');
+            }
+
+            const order = await ismDb.order.findByPk(orderId, {
+                include: [
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
+                ],
+                rejectOnEmpty: new OrderNotFoundError(),
+            });
+
+            return await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    const updateDeliverOrderNote: Promise<ismDb.deliverOrder>[] = [];
+
+                    const originalDeliverOrder = order.deliverOrders;
+
+                    for (let n = 0; n < deliverOrder.length; n += 1) {
+                        for (let i = 0; i < originalDeliverOrder.length; i += 1) {
+                            if (originalDeliverOrder[i].id === deliverOrder[n].deliverOrderId) {
+                                if (deliverOrder[n].receivingNote) {
+                                    originalDeliverOrder[i].receivingNote = deliverOrder[n].receivingNote ?? originalDeliverOrder[i].receivingNote;
+                                }
+                                if (deliverOrder[n].cranesNote) {
+                                    originalDeliverOrder[i].cranesNote = deliverOrder[n].cranesNote ?? originalDeliverOrder[i].cranesNote;
+                                }
+                                if (deliverOrder[n].documentNote) {
+                                    originalDeliverOrder[i].documentNote = deliverOrder[n].documentNote ?? originalDeliverOrder[i].documentNote;
+                                }
+                                if (deliverOrder[n].otherNote) {
+                                    originalDeliverOrder[i].otherNote = deliverOrder[n].otherNote ?? originalDeliverOrder[i].otherNote;
+                                }
+
+                                updateDeliverOrderNote.push(originalDeliverOrder[i].save({ transaction: t }));
+                            }
+                        }
+                    }
+
+                    const notificationForUsers = await ismDb.user.findAll({
+                        where: {
+                            role: [RoleList.admin, RoleList.director, RoleList.accountant, RoleList.sales],
+                        },
+                        attributes: ['id'],
+                    });
+
+                    const ids = notificationForUsers.map((e) => e.id);
+
+                    const userIds = ids.filter((e) => e !== userId);
+
+                    const description = `Đơn hàng ${order.invoiceNo} vừa được cập nhật`;
+
+                    order.status = iStatusOrderToStatusOrder(statusOrder);
+
+                    const notificationAttribute: notificationCreationAttributes = {
+                        orderId,
+                        event: NotificationEvent.DeliverResolverUpdated,
+                        content: description,
+                    };
+
+                    const notification: ismDb.notification = await ismDb.notification.create(notificationAttribute, { transaction: t });
+
+                    const userNotificationPromise: Promise<ismDb.userNotification>[] = [];
+
+                    userIds.forEach((id) => {
+                        const userNotificationAttribute: userNotificationCreationAttributes = {
+                            userId: id,
+                            notificationId: notification.id,
+                            isRead: false,
+                        };
+
+                        const createUserNotification = ismDb.userNotification.create(userNotificationAttribute, { transaction: t });
+
+                        userNotificationPromise.push(createUserNotification);
+                    });
+
+                    await Promise.all(userNotificationPromise);
+
+                    if (updateDeliverOrderNote.length > 0) await Promise.all(updateDeliverOrderNote);
+
+                    await order.save({ transaction: t });
+
+                    return ISuccessResponse.Success;
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError(`Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`);
                 }
             });
         },

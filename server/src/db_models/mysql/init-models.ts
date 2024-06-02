@@ -80,7 +80,7 @@ export function initModels(sequelize: Sequelize) {
     const user = _user.initModel(sequelize);
     const userNotification = _userNotification.initModel(sequelize);
 
-    product.belongsTo(categories, { as: 'category_category', foreignKey: 'category' });
+    product.belongsTo(categories, { as: 'category_categoryProduct', foreignKey: 'category' });
     categories.hasMany(product, { as: 'products', foreignKey: 'category' });
     deliverOrder.belongsTo(customer, { as: 'customer', foreignKey: 'customerId' });
     customer.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'customerId' });

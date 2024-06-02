@@ -145,6 +145,8 @@ type Mutation {
     updatePriceQuotation(input: UpdatePriceQuotationInput!): SuccessResponse!
     updateProductById(input: UpdateProductByIdInput!): SuccessResponse!
     updateProductPriceById(input: UpdateProductPriceByIdInput!): SuccessResponse!
+    updateStatusOrderForDriver(input: UpdateStatusOrderForDriverInput!): SuccessResponse!
+    updateStatusOrderOfAccountant(input: UpdateStatusOrderOfAccountantInput!): SuccessResponse!
     updateStatusUserNotification(input: UpdateStatusUserNotificationInput!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
 }
@@ -637,6 +639,17 @@ input UpdateDeliverOrderInput {
     receivingNote: String
 }
 
+input UpdateDeliverOrderNoteInput {
+    cranesNote: String
+    deliverOrderId: Int!
+    documentNote: String
+    name: String
+    otherNote: String
+    receiver: String
+    receiverPhoneNumber: String
+    receivingNote: String
+}
+
 input UpdateOrderInput {
     VAT: Float
     customerId: Int
@@ -695,6 +708,20 @@ input UpdateProductPriceByIdInput {
     priceWithVAT: Float
     priceWithoutVAT: Float
     productId: [Int!]!
+}
+
+input UpdateStatusOrderForDriverInput {
+    deliverOrder: [UpdateDeliverOrderNoteInput!]!
+    orderId: Int!
+    statusOrder: StatusOrder!
+    userId: Int!
+}
+
+input UpdateStatusOrderOfAccountantInput {
+    deliverOrder: [UpdateDeliverOrderNoteInput!]!
+    orderId: Int!
+    statusOrder: StatusOrder!
+    userId: Int!
 }
 
 input UpdateStatusUserNotificationInput {

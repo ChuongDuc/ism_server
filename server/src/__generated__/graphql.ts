@@ -364,6 +364,8 @@ export type IMutation = {
   updatePriceQuotation: ISuccessResponse;
   updateProductById: ISuccessResponse;
   updateProductPriceById: ISuccessResponse;
+  updateStatusOrderForDriver: ISuccessResponse;
+  updateStatusOrderOfAccountant: ISuccessResponse;
   updateStatusUserNotification: ISuccessResponse;
   updateUser: ISuccessResponse;
 };
@@ -491,6 +493,16 @@ export type IMutationUpdateProductByIdArgs = {
 
 export type IMutationUpdateProductPriceByIdArgs = {
   input: IUpdateProductPriceByIdInput;
+};
+
+
+export type IMutationUpdateStatusOrderForDriverArgs = {
+  input: IUpdateStatusOrderForDriverInput;
+};
+
+
+export type IMutationUpdateStatusOrderOfAccountantArgs = {
+  input: IUpdateStatusOrderOfAccountantInput;
 };
 
 
@@ -827,6 +839,17 @@ export type IUpdateDeliverOrderInput = {
   receivingNote?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type IUpdateDeliverOrderNoteInput = {
+  cranesNote?: InputMaybe<Scalars['String']['input']>;
+  deliverOrderId: Scalars['Int']['input'];
+  documentNote?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  otherNote?: InputMaybe<Scalars['String']['input']>;
+  receiver?: InputMaybe<Scalars['String']['input']>;
+  receiverPhoneNumber?: InputMaybe<Scalars['String']['input']>;
+  receivingNote?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type IUpdateOrderInput = {
   VAT?: InputMaybe<Scalars['Float']['input']>;
   customerId?: InputMaybe<Scalars['Int']['input']>;
@@ -885,6 +908,20 @@ export type IUpdateProductPriceByIdInput = {
   priceWithVAT?: InputMaybe<Scalars['Float']['input']>;
   priceWithoutVAT?: InputMaybe<Scalars['Float']['input']>;
   productId: Array<Scalars['Int']['input']>;
+};
+
+export type IUpdateStatusOrderForDriverInput = {
+  deliverOrder: Array<IUpdateDeliverOrderNoteInput>;
+  orderId: Scalars['Int']['input'];
+  statusOrder: IStatusOrder;
+  userId: Scalars['Int']['input'];
+};
+
+export type IUpdateStatusOrderOfAccountantInput = {
+  deliverOrder: Array<IUpdateDeliverOrderNoteInput>;
+  orderId: Scalars['Int']['input'];
+  statusOrder: IStatusOrder;
+  userId: Scalars['Int']['input'];
 };
 
 export type IUpdateStatusUserNotificationInput = {
@@ -1138,12 +1175,15 @@ export type IResolversTypes = {
   UpdateCategoryInput: IUpdateCategoryInput;
   UpdateCustomerInput: IUpdateCustomerInput;
   UpdateDeliverOrderInput: IUpdateDeliverOrderInput;
+  UpdateDeliverOrderNoteInput: IUpdateDeliverOrderNoteInput;
   UpdateOrderInput: IUpdateOrderInput;
   UpdatePaymentInforInput: IUpdatePaymentInforInput;
   UpdatePriceQuotationInput: IUpdatePriceQuotationInput;
   UpdateProductByIdInput: IUpdateProductByIdInput;
   UpdateProductInput: IUpdateProductInput;
   UpdateProductPriceByIdInput: IUpdateProductPriceByIdInput;
+  UpdateStatusOrderForDriverInput: IUpdateStatusOrderForDriverInput;
+  UpdateStatusOrderOfAccountantInput: IUpdateStatusOrderOfAccountantInput;
   UpdateStatusUserNotificationInput: IUpdateStatusUserNotificationInput;
   UpdateUserInput: IUpdateUserInput;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
@@ -1230,12 +1270,15 @@ export type IResolversParentTypes = {
   UpdateCategoryInput: IUpdateCategoryInput;
   UpdateCustomerInput: IUpdateCustomerInput;
   UpdateDeliverOrderInput: IUpdateDeliverOrderInput;
+  UpdateDeliverOrderNoteInput: IUpdateDeliverOrderNoteInput;
   UpdateOrderInput: IUpdateOrderInput;
   UpdatePaymentInforInput: IUpdatePaymentInforInput;
   UpdatePriceQuotationInput: IUpdatePriceQuotationInput;
   UpdateProductByIdInput: IUpdateProductByIdInput;
   UpdateProductInput: IUpdateProductInput;
   UpdateProductPriceByIdInput: IUpdateProductPriceByIdInput;
+  UpdateStatusOrderForDriverInput: IUpdateStatusOrderForDriverInput;
+  UpdateStatusOrderOfAccountantInput: IUpdateStatusOrderOfAccountantInput;
   UpdateStatusUserNotificationInput: IUpdateStatusUserNotificationInput;
   UpdateUserInput: IUpdateUserInput;
   Upload: Scalars['Upload']['output'];
@@ -1416,6 +1459,8 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   updatePriceQuotation?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdatePriceQuotationArgs, 'input'>>;
   updateProductById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateProductByIdArgs, 'input'>>;
   updateProductPriceById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateProductPriceByIdArgs, 'input'>>;
+  updateStatusOrderForDriver?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateStatusOrderForDriverArgs, 'input'>>;
+  updateStatusOrderOfAccountant?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateStatusOrderOfAccountantArgs, 'input'>>;
   updateStatusUserNotification?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateStatusUserNotificationArgs, 'input'>>;
   updateUser?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateUserArgs, 'input'>>;
 };
