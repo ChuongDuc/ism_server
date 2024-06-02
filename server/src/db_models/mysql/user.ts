@@ -103,6 +103,29 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
 
     countOrders!: Sequelize.HasManyCountAssociationsMixin;
 
+    // user hasMany order via driverId
+    driver_orders!: order[];
+
+    getDriver_orders!: Sequelize.HasManyGetAssociationsMixin<order>;
+
+    setDriver_orders!: Sequelize.HasManySetAssociationsMixin<order, orderId>;
+
+    addDriver_order!: Sequelize.HasManyAddAssociationMixin<order, orderId>;
+
+    addDriver_orders!: Sequelize.HasManyAddAssociationsMixin<order, orderId>;
+
+    createDriver_order!: Sequelize.HasManyCreateAssociationMixin<order>;
+
+    removeDriver_order!: Sequelize.HasManyRemoveAssociationMixin<order, orderId>;
+
+    removeDriver_orders!: Sequelize.HasManyRemoveAssociationsMixin<order, orderId>;
+
+    hasDriver_order!: Sequelize.HasManyHasAssociationMixin<order, orderId>;
+
+    hasDriver_orders!: Sequelize.HasManyHasAssociationsMixin<order, orderId>;
+
+    countDriver_orders!: Sequelize.HasManyCountAssociationsMixin;
+
     // user hasMany userNotification via userId
     userNotifications!: userNotification[];
 

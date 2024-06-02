@@ -6,15 +6,15 @@ import type { orderDetail, orderDetailId } from './orderDetail';
 export interface itemGroupAttributes {
     id: number;
     orderId: number;
-    name?: string;
     description?: string;
+    name?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export type itemGroupPk = 'id';
 export type itemGroupId = itemGroup[itemGroupPk];
-export type itemGroupOptionalAttributes = 'id' | 'description' | 'createdAt' | 'updatedAt' | 'name';
+export type itemGroupOptionalAttributes = 'id' | 'description' | 'name' | 'createdAt' | 'updatedAt';
 export type itemGroupCreationAttributes = Optional<itemGroupAttributes, itemGroupOptionalAttributes>;
 
 export class itemGroup extends Model<itemGroupAttributes, itemGroupCreationAttributes> implements itemGroupAttributes {
@@ -22,9 +22,9 @@ export class itemGroup extends Model<itemGroupAttributes, itemGroupCreationAttri
 
     orderId!: number;
 
-    name?: string;
-
     description?: string;
+
+    name?: string;
 
     createdAt?: Date;
 

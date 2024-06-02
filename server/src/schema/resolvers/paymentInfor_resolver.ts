@@ -19,7 +19,7 @@ const paymentInfoResolver: IResolvers = {
         id: (parent) => parent.id,
     },
     Mutation: {
-        createPaymentInfo: async (_parent, { input }, context: SmContext) => {
+        createPaymentInfor: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
             if (context.user?.role !== RoleList.accountant && context.user?.role !== RoleList.director && context.user?.role !== RoleList.sales) {
                 throw new PermissionError();
@@ -102,7 +102,7 @@ const paymentInfoResolver: IResolvers = {
                 }
             });
         },
-        updatePaymentInfo: async (_parent, { input }, context: SmContext) => {
+        updatePaymentInfor: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
             if (context.user?.role !== RoleList.accountant && context.user?.role !== RoleList.director && context.user?.role !== RoleList.sales) {
                 throw new PermissionError();
@@ -185,7 +185,7 @@ const paymentInfoResolver: IResolvers = {
                 }
             });
         },
-        deletePaymentInfo: async (_parent, { input }, context: SmContext) => {
+        deletePaymentInfor: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
             if (context.user?.role !== RoleList.accountant && context.user?.role !== RoleList.director && context.user?.role !== RoleList.sales) {
                 throw new PermissionError();

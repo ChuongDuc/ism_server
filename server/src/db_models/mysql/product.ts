@@ -80,14 +80,14 @@ export class product extends Model<productAttributes, productCreationAttributes>
 
     updatedAt?: Date;
 
-    // product belongsTo categories via categoryId
-    category_categoryProduct!: categories;
+    // product belongsTo categories via category
+    category_category!: categories;
 
-    getCategory_categoryProduct!: Sequelize.BelongsToGetAssociationMixin<categories>;
+    getCategory_category!: Sequelize.BelongsToGetAssociationMixin<categories>;
 
-    setCategory!: Sequelize.BelongsToSetAssociationMixin<categories, categoriesId>;
+    setCategory_category!: Sequelize.BelongsToSetAssociationMixin<categories, categoriesId>;
 
-    createCategory!: Sequelize.BelongsToCreateAssociationMixin<categories>;
+    createCategory_category!: Sequelize.BelongsToCreateAssociationMixin<categories>;
 
     // product hasMany orderDetail via productId
     orderDetails!: orderDetail[];

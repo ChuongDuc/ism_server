@@ -1,9 +1,9 @@
 extend type Mutation {
-    createPaymentInfo(input: CreatePaymentInforInput!): SuccessResponse!
+    createPaymentInfor(input: CreatePaymentInforInput!): SuccessResponse!
 
-    updatePaymentInfo(input: UpdatePaymentInforInput!): SuccessResponse!
+    updatePaymentInfor(input: UpdatePaymentInforInput!): SuccessResponse!
 
-    deletePaymentInfo(input: DeletePaymentInforInput!): SuccessResponse!
+    deletePaymentInfor(input: DeletePaymentInforInput!): SuccessResponse!
 }
 
 type PaymentInfor {

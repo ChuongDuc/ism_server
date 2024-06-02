@@ -12,9 +12,9 @@ export interface orderDetailAttributes {
     description?: string;
     deliveryMethodNote?: string;
     otherNote?: string;
+    weightProduct?: number;
     createdAt?: Date;
     updatedAt?: Date;
-    weightProduct?: number;
 }
 
 export type orderDetailPk = 'id';
@@ -27,9 +27,9 @@ export type orderDetailOptionalAttributes =
     | 'description'
     | 'deliveryMethodNote'
     | 'otherNote'
+    | 'weightProduct'
     | 'createdAt'
-    | 'updatedAt'
-    | 'weightProduct';
+    | 'updatedAt';
 export type orderDetailCreationAttributes = Optional<orderDetailAttributes, orderDetailOptionalAttributes>;
 
 export class orderDetail extends Model<orderDetailAttributes, orderDetailCreationAttributes> implements orderDetailAttributes {
@@ -49,11 +49,11 @@ export class orderDetail extends Model<orderDetailAttributes, orderDetailCreatio
 
     otherNote?: string;
 
+    weightProduct?: number;
+
     createdAt?: Date;
 
     updatedAt?: Date;
-
-    weightProduct?: number;
 
     // orderDetail belongsTo itemGroup via itemGroupId
     itemGroup!: itemGroup;

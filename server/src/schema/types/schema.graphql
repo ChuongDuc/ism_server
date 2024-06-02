@@ -124,14 +124,14 @@ type Mutation {
     createCustomer(input: CreateCustomerInput!): Customer!
     createDeliverOrder(input: CreateDeliverOrderInput!): DeliverOrder!
     createOrder(input: CreateOrderInput!): Order!
-    createPaymentInfo(input: CreatePaymentInforInput!): SuccessResponse!
+    createPaymentInfor(input: CreatePaymentInforInput!): SuccessResponse!
     createPriceQuotation(input: CreatePriceQuotationInput!): [ItemGroup]!
     createProduct(input: CreateProductInput!): Product!
     createUser(input: CreateUserInput!): User!
     deleteCustomer(input: DeleteCustomerInput!): SuccessResponse!
     deleteDeliverOrders(input: DeleteDeliverOrdersInput!): SuccessResponse!
     deleteOrder(input: DeleteOrderInput!): SuccessResponse!
-    deletePaymentInfo(input: DeletePaymentInforInput!): SuccessResponse!
+    deletePaymentInfor(input: DeletePaymentInforInput!): SuccessResponse!
     deleteProductById(input: DeleteProductByIdInput!): SuccessResponse!
     deleteUser(input: DeleteUserInput!): SuccessResponse!
     importFileExcelInventory(input: ImportFileExcelInventoryInput!): [Inventory]!
@@ -141,7 +141,7 @@ type Mutation {
     updateCustomer(input: UpdateCustomerInput!): SuccessResponse!
     updateDeliverOrder(input: UpdateDeliverOrderInput!): SuccessResponse!
     updateOrder(input: UpdateOrderInput!): SuccessResponse!
-    updatePaymentInfo(input: UpdatePaymentInforInput!): SuccessResponse!
+    updatePaymentInfor(input: UpdatePaymentInforInput!): SuccessResponse!
     updatePriceQuotation(input: UpdatePriceQuotationInput!): SuccessResponse!
     updateProductById(input: UpdateProductByIdInput!): SuccessResponse!
     updateProductPriceById(input: UpdateProductPriceByIdInput!): SuccessResponse!

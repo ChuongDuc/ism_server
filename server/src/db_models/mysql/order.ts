@@ -18,16 +18,16 @@ export interface orderAttributes {
     saleId: number;
     invoiceNo: string;
     VAT?: number;
-    discount?: number;
+    freightPrice?: number;
+    deliverAddress?: string;
     status?: string;
     driverId?: number;
-    freightPrice: number;
+    discount?: number;
     percentOfAdvancePayment?: number;
     reportingValidityAmount?: number;
     deliveryMethodDescription?: string;
     executionTimeDescription?: string;
     freightMessage?: string;
-    deliverAddress?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -37,16 +37,16 @@ export type orderId = order[orderPk];
 export type orderOptionalAttributes =
     | 'id'
     | 'VAT'
-    | 'discount'
+    | 'freightPrice'
+    | 'deliverAddress'
     | 'status'
     | 'driverId'
-    | 'freightPrice'
+    | 'discount'
     | 'percentOfAdvancePayment'
     | 'reportingValidityAmount'
     | 'deliveryMethodDescription'
     | 'executionTimeDescription'
     | 'freightMessage'
-    | 'deliverAddress'
     | 'createdAt'
     | 'updatedAt';
 export type orderCreationAttributes = Optional<orderAttributes, orderOptionalAttributes>;
@@ -65,15 +65,15 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
 
     VAT?: number;
 
-    discount?: number;
+    freightPrice?: number;
+
+    deliverAddress?: string;
 
     status?: string;
 
     driverId?: number;
 
-    freightPrice!: number;
-
-    totalMoney!: number;
+    discount?: number;
 
     percentOfAdvancePayment?: number;
 
@@ -85,7 +85,7 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
 
     freightMessage?: string;
 
-    deliverAddress?: string;
+    totalMoney!: number;
 
     remainingPaymentMoney!: number;
 
@@ -313,6 +313,41 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
                     type: DataTypes.STRING(200),
                     allowNull: true,
                 },
+                driverId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                    references: {
+                        model: 'user',
+                        key: 'id',
+                    },
+                },
+                discount: {
+                    type: DataTypes.FLOAT,
+                    allowNull: true,
+                    defaultValue: 0,
+                },
+                percentOfAdvancePayment: {
+                    type: DataTypes.FLOAT,
+                    allowNull: true,
+                    defaultValue: 0,
+                },
+                reportingValidityAmount: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                    defaultValue: 0,
+                },
+                deliveryMethodDescription: {
+                    type: DataTypes.STRING(300),
+                    allowNull: true,
+                },
+                executionTimeDescription: {
+                    type: DataTypes.STRING(300),
+                    allowNull: true,
+                },
+                freightMessage: {
+                    type: DataTypes.STRING(300),
+                    allowNull: true,
+                },
             },
             {
                 sequelize,
@@ -334,6 +369,11 @@ export class order extends Model<orderAttributes, orderCreationAttributes> imple
                         name: 'fk_order_2_idx',
                         using: 'BTREE',
                         fields: [{ name: 'saleId' }],
+                    },
+                    {
+                        name: 'fk_order_3_idx',
+                        using: 'BTREE',
+                        fields: [{ name: 'driverId' }],
                     },
                 ],
             }

@@ -30,7 +30,7 @@ const product_resolver: IResolvers = {
 
         type: (parent) => ITypeProductTypeResolve(parent.type),
 
-        category: async (parent) => parent.category_categoryProduct ?? (await parent.getCategory_categoryProduct()),
+        category: async (parent) => parent.category_category ?? (await parent.getCategory_category()),
     },
 
     Query: {
@@ -45,7 +45,7 @@ const product_resolver: IResolvers = {
                 include: [
                     {
                         model: ismDb.categories,
-                        as: 'category_categoryProduct',
+                        as: 'category_category',
                         required: true,
                     },
                 ],

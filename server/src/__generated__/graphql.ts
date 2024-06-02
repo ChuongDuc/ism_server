@@ -343,14 +343,14 @@ export type IMutation = {
   createCustomer: ICustomer;
   createDeliverOrder: IDeliverOrder;
   createOrder: IOrder;
-  createPaymentInfo: ISuccessResponse;
+  createPaymentInfor: ISuccessResponse;
   createPriceQuotation: Array<Maybe<IItemGroup>>;
   createProduct: IProduct;
   createUser: IUser;
   deleteCustomer: ISuccessResponse;
   deleteDeliverOrders: ISuccessResponse;
   deleteOrder: ISuccessResponse;
-  deletePaymentInfo: ISuccessResponse;
+  deletePaymentInfor: ISuccessResponse;
   deleteProductById: ISuccessResponse;
   deleteUser: ISuccessResponse;
   importFileExcelInventory: Array<Maybe<IInventory>>;
@@ -360,7 +360,7 @@ export type IMutation = {
   updateCustomer: ISuccessResponse;
   updateDeliverOrder: ISuccessResponse;
   updateOrder: ISuccessResponse;
-  updatePaymentInfo: ISuccessResponse;
+  updatePaymentInfor: ISuccessResponse;
   updatePriceQuotation: ISuccessResponse;
   updateProductById: ISuccessResponse;
   updateProductPriceById: ISuccessResponse;
@@ -391,7 +391,7 @@ export type IMutationCreateOrderArgs = {
 };
 
 
-export type IMutationCreatePaymentInfoArgs = {
+export type IMutationCreatePaymentInforArgs = {
   input: ICreatePaymentInforInput;
 };
 
@@ -426,7 +426,7 @@ export type IMutationDeleteOrderArgs = {
 };
 
 
-export type IMutationDeletePaymentInfoArgs = {
+export type IMutationDeletePaymentInforArgs = {
   input: IDeletePaymentInforInput;
 };
 
@@ -476,7 +476,7 @@ export type IMutationUpdateOrderArgs = {
 };
 
 
-export type IMutationUpdatePaymentInfoArgs = {
+export type IMutationUpdatePaymentInforArgs = {
   input: IUpdatePaymentInforInput;
 };
 
@@ -1438,14 +1438,14 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   createCustomer?: Resolver<IResolversTypes['Customer'], ParentType, ContextType, RequireFields<IMutationCreateCustomerArgs, 'input'>>;
   createDeliverOrder?: Resolver<IResolversTypes['DeliverOrder'], ParentType, ContextType, RequireFields<IMutationCreateDeliverOrderArgs, 'input'>>;
   createOrder?: Resolver<IResolversTypes['Order'], ParentType, ContextType, RequireFields<IMutationCreateOrderArgs, 'input'>>;
-  createPaymentInfo?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationCreatePaymentInfoArgs, 'input'>>;
+  createPaymentInfor?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationCreatePaymentInforArgs, 'input'>>;
   createPriceQuotation?: Resolver<Array<Maybe<IResolversTypes['ItemGroup']>>, ParentType, ContextType, RequireFields<IMutationCreatePriceQuotationArgs, 'input'>>;
   createProduct?: Resolver<IResolversTypes['Product'], ParentType, ContextType, RequireFields<IMutationCreateProductArgs, 'input'>>;
   createUser?: Resolver<IResolversTypes['User'], ParentType, ContextType, RequireFields<IMutationCreateUserArgs, 'input'>>;
   deleteCustomer?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteCustomerArgs, 'input'>>;
   deleteDeliverOrders?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteDeliverOrdersArgs, 'input'>>;
   deleteOrder?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteOrderArgs, 'input'>>;
-  deletePaymentInfo?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeletePaymentInfoArgs, 'input'>>;
+  deletePaymentInfor?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeletePaymentInforArgs, 'input'>>;
   deleteProductById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteProductByIdArgs, 'input'>>;
   deleteUser?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteUserArgs, 'input'>>;
   importFileExcelInventory?: Resolver<Array<Maybe<IResolversTypes['Inventory']>>, ParentType, ContextType, RequireFields<IMutationImportFileExcelInventoryArgs, 'input'>>;
@@ -1455,7 +1455,7 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   updateCustomer?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateCustomerArgs, 'input'>>;
   updateDeliverOrder?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateDeliverOrderArgs, 'input'>>;
   updateOrder?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateOrderArgs, 'input'>>;
-  updatePaymentInfo?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdatePaymentInfoArgs, 'input'>>;
+  updatePaymentInfor?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdatePaymentInforArgs, 'input'>>;
   updatePriceQuotation?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdatePriceQuotationArgs, 'input'>>;
   updateProductById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateProductByIdArgs, 'input'>>;
   updateProductPriceById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateProductPriceByIdArgs, 'input'>>;
