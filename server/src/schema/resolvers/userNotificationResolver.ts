@@ -69,7 +69,7 @@ const userNotificationResolver: IResolvers = {
                     },
                 ],
                 distinct: true,
-                order: [['idUserNotification', 'DESC']],
+                order: [['id', 'DESC']],
             };
 
             const whereOpt: WhereOptions<ismDb.userNotification> = {};
@@ -91,9 +91,13 @@ const userNotificationResolver: IResolvers = {
 
         listArrayUserNotification: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            const { userId, event } = input;
+            const { userId, event, args } = input;
+
+            const { limit, offset, limitForLast } = getRDBPaginationParams(args);
 
             const option: FindAndCountOptions<ismDb.userNotification> = {
+                limit,
+                offset,
                 include: [
                     {
                         model: ismDb.user,
@@ -135,7 +139,52 @@ const userNotificationResolver: IResolvers = {
                     },
                 ],
                 distinct: true,
-                order: [['idUserNotification', 'DESC']],
+                order: [['id', 'DESC']],
+            };
+
+            const option2: FindAndCountOptions<ismDb.userNotification> = {
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'user',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.notification,
+                        as: 'notification',
+                        required: true,
+                        include: [
+                            {
+                                model: ismDb.order,
+                                as: 'order',
+                                required: false,
+                                include: [
+                                    {
+                                        model: ismDb.itemGroup,
+                                        as: 'itemGroups',
+                                        required: false,
+                                        include: [
+                                            {
+                                                model: ismDb.orderDetail,
+                                                as: 'orderDetails',
+                                                required: false,
+                                                include: [
+                                                    {
+                                                        model: ismDb.product,
+                                                        as: 'product',
+                                                        required: false,
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+                distinct: true,
+                order: [['id', 'DESC']],
             };
 
             const whereOpt: WhereOptions<ismDb.userNotification> = {};
@@ -150,17 +199,31 @@ const userNotificationResolver: IResolvers = {
             }
 
             option.where = whereOpt;
+            option2.where = whereOpt;
 
-            const allUserNotification = await ismDb.userNotification.findAll(option);
+            const count = await ismDb.userNotification.findAll(option2);
+            const allUserNotification = await ismDb.userNotification.findAndCountAll(option);
 
-            // Get unique user notifications based on orderId
-            return allUserNotification.reduce((uniqueList: ismDb.userNotification[], notification: ismDb.userNotification) => {
+            const notificationRows = allUserNotification?.rows.reduce(
+                (uniqueList: ismDb.userNotification[], notification: ismDb.userNotification) => {
+                    const orderId = notification.notification?.order?.id;
+                    if (orderId && !uniqueList.some((item) => item.notification?.order?.id === orderId)) {
+                        uniqueList.push(notification);
+                    }
+                    return uniqueList;
+                },
+                []
+            );
+
+            const countNotification = count.reduce((uniqueList: ismDb.userNotification[], notification: ismDb.userNotification) => {
                 const orderId = notification.notification?.order?.id;
                 if (orderId && !uniqueList.some((item) => item.notification?.order?.id === orderId)) {
                     uniqueList.push(notification);
                 }
                 return uniqueList;
             }, []);
+
+            return convertRDBRowsToConnection({ rows: notificationRows, count: countNotification.length }, offset, limitForLast);
         },
     },
     Mutation: {

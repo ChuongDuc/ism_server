@@ -1,6 +1,6 @@
  extend type Query {
      listUserNotification(input: ListUserNotificationInput!): UserNotificationConnection!
-     listArrayUserNotification(input: ListArrayUserNotificationInput!): [UserNotification]!
+     listArrayUserNotification(input: ListArrayUserNotificationInput!): UserNotificationConnection!
  }
 
  extend type Mutation {
@@ -8,7 +8,7 @@
  }
 
  type UserNotification {
-     idUserNotification:Int!
+     id:Int!
      user: User!
      notification: Notification!
      isRead: Boolean!
@@ -36,6 +36,7 @@
  input ListArrayUserNotificationInput{
      userId: Int!
      event: NotificationEvent
+     args: PaginationInput
  }
 
  input UpdateStatusUserNotificationInput {

@@ -327,6 +327,7 @@ export type IListAllProductsInput = {
 };
 
 export type IListArrayUserNotificationInput = {
+  args?: InputMaybe<IPaginationInput>;
   event?: InputMaybe<INotificationEvent>;
   userId: Scalars['Int']['input'];
 };
@@ -681,7 +682,7 @@ export type IQuery = {
   listAllDeliverOrder: IListAllDeliverOrderResponse;
   listAllInventory: IInventoryConnection;
   listAllProducts: IProductConnection;
-  listArrayUserNotification: Array<Maybe<IUserNotification>>;
+  listArrayUserNotification: IUserNotificationConnection;
   listUserNotification: IUserNotificationConnection;
   login: IUserLoginResponse;
   me: IUser;
@@ -988,7 +989,7 @@ export type IUserLoginResponse = {
 export type IUserNotification = {
   __typename?: 'UserNotification';
   createdAt?: Maybe<Scalars['Date']['output']>;
-  idUserNotification: Scalars['Int']['output'];
+  id: Scalars['Int']['output'];
   isRead: Scalars['Boolean']['output'];
   notification: INotification;
   updatedAt?: Maybe<Scalars['Date']['output']>;
@@ -1598,7 +1599,7 @@ export type IQueryResolvers<ContextType = any, ParentType extends IResolversPare
   listAllDeliverOrder?: Resolver<IResolversTypes['ListAllDeliverOrderResponse'], ParentType, ContextType, RequireFields<IQueryListAllDeliverOrderArgs, 'input'>>;
   listAllInventory?: Resolver<IResolversTypes['InventoryConnection'], ParentType, ContextType, RequireFields<IQueryListAllInventoryArgs, 'input'>>;
   listAllProducts?: Resolver<IResolversTypes['ProductConnection'], ParentType, ContextType, RequireFields<IQueryListAllProductsArgs, 'input'>>;
-  listArrayUserNotification?: Resolver<Array<Maybe<IResolversTypes['UserNotification']>>, ParentType, ContextType, RequireFields<IQueryListArrayUserNotificationArgs, 'input'>>;
+  listArrayUserNotification?: Resolver<IResolversTypes['UserNotificationConnection'], ParentType, ContextType, RequireFields<IQueryListArrayUserNotificationArgs, 'input'>>;
   listUserNotification?: Resolver<IResolversTypes['UserNotificationConnection'], ParentType, ContextType, RequireFields<IQueryListUserNotificationArgs, 'input'>>;
   login?: Resolver<IResolversTypes['UserLoginResponse'], ParentType, ContextType, RequireFields<IQueryLoginArgs, 'input'>>;
   me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
@@ -1652,7 +1653,7 @@ export type IUserLoginResponseResolvers<ContextType = any, ParentType extends IR
 
 export type IUserNotificationResolvers<ContextType = any, ParentType extends IResolversParentTypes['UserNotification'] = IResolversParentTypes['UserNotification']> = {
   createdAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
-  idUserNotification?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
   isRead?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
   notification?: Resolver<IResolversTypes['Notification'], ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
