@@ -1,5 +1,5 @@
-import { IFormType, INotificationEvent, IRole, IStatusOrder, ITypeProduct, IUnit } from '../__generated__/graphql';
-import { formType, RoleList, StatusOrder, TypeProduct, Unit } from './enum';
+import { IFormType, INotificationEvent, IRole, IStatusOrder, ITypeProduct, ITypeVehicle, IUnit } from '../__generated__/graphql';
+import { formType, RoleList, StatusOrder, TypeProduct, TypeVehicle, Unit } from './enum';
 import { InValidRoleError, InValidValueError } from './classes/graphqlErrors';
 import { NotificationEvent } from './classes/PubSubService';
 
@@ -115,8 +115,8 @@ export const iNotificationEventToValueResolve = (event: INotificationEvent) => {
             return NotificationEvent.DeliverResolverUpdated;
         case INotificationEvent.DeliverResolverDelete:
             return NotificationEvent.DeliverResolverDelete;
-        // case INotificationEvent.NewVehicle:
-        //     return NotificationEvent.NewVehicle;
+        case INotificationEvent.NewVehicle:
+            return NotificationEvent.NewVehicle;
         // case INotificationEvent.VehicleUpdated:
         //     return NotificationEvent.VehicleUpdated;
         // case INotificationEvent.VehicleDeleted:
@@ -225,6 +225,28 @@ export const formTypeToIFormType = (formTypeString: string | undefined) => {
             return IFormType.Vat;
         case formType.tonnage:
             return IFormType.Tonnage;
+        default:
+            throw new InValidValueError();
+    }
+};
+
+export const TypeVehicleToITypeVehicle = (input: TypeVehicle | string) => {
+    switch (input) {
+        case TypeVehicle.container:
+            return ITypeVehicle.Container;
+        case TypeVehicle.truck:
+            return ITypeVehicle.Truck;
+        default:
+            throw new InValidValueError();
+    }
+};
+
+export const iTypeVehicleToTypeVehicle = (input: ITypeVehicle) => {
+    switch (input) {
+        case ITypeVehicle.Container:
+            return TypeVehicle.container;
+        case ITypeVehicle.Truck:
+            return TypeVehicle.truck;
         default:
             throw new InValidValueError();
     }

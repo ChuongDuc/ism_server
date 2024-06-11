@@ -9,5 +9,19 @@ import userNotification from './userNotificationResolver';
 import deliverOrder from './deliver_order_resolver';
 import priceQuotation from './price_quotation_resolver';
 import paymentInfor from './paymentInfor_resolver';
+import vehicle from './vehicle_resolver';
 
-export default [user, customer, inventory, category, product, notification, order, userNotification, deliverOrder, priceQuotation, paymentInfor];
+export default [
+    user,
+    customer,
+    inventory,
+    category,
+    product,
+    notification,
+    order,
+    userNotification,
+    deliverOrder,
+    priceQuotation,
+    paymentInfor,
+    vehicle,
+];

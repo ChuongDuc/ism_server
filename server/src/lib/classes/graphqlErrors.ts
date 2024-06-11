@@ -45,6 +45,9 @@ export enum ISM_ERROR_CODE {
     DuplicateCategoryProduct = 'DuplicateCategoryProduct',
     EmptyValue = 'EmptyValue',
     PaymentInfoNotFound = 'PaymentInfoNotFound Error',
+    DriverAlreadyExist = 'DriverAlreadyExistError',
+    LicensePlatesAlreadyExist = 'LicensePlatesAlreadyExistError',
+    VehicleNotExist = 'VehicleNotExist',
 }
 
 export class AuthenticationError extends GraphQLError {
@@ -232,6 +235,36 @@ export class PaymentInfoNotFoundError extends GraphQLError {
         super(message || 'Thông tin thanh toán không tồn tại', {
             extensions: {
                 code: ISM_ERROR_CODE.PaymentInfoNotFound,
+            },
+        });
+    }
+}
+
+export class DriverAlreadyExistError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Phương tiện của lái xe đã tồn tại. Hãy chọn lái xe khác', {
+            extensions: {
+                code: ISM_ERROR_CODE.DriverAlreadyExist,
+            },
+        });
+    }
+}
+
+export class LicensePlatesAlreadyExistError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Biển số xe của lái xe đã tồn tại. Hãy chọn biển số xe khác', {
+            extensions: {
+                code: ISM_ERROR_CODE.LicensePlatesAlreadyExist,
+            },
+        });
+    }
+}
+
+export class VehicleNotExistError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Xe - Phương tiện không tồn tại.', {
+            extensions: {
+                code: ISM_ERROR_CODE.VehicleNotExist,
             },
         });
     }

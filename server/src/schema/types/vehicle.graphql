@@ -1,0 +1,72 @@
+extend type Query {
+    listAllVehicle(input: ListAllVehicleInput!): VehicleConnection!
+
+    listDriverUnselectedVehicle: [User]!
+}
+
+
+extend type Mutation {
+    createVehicle(input: CreateVehicleInput!): Vehicle!
+
+    updateVehicle(input: UpdateVehicleInput!): SuccessResponse!
+
+    deleteVehicle(input: DeleteVehicleInput!): SuccessResponse!
+}
+
+type Vehicle {
+    id: Int!
+    driver: User!
+    typeVehicle: TypeVehicle!
+    weight: Float!
+    licensePlates: String!
+    note: String
+    createdAt: Date
+    updatedAt: Date
+}
+
+enum TypeVehicle {
+    container
+    truck
+}
+
+type VehicleConnection {
+    edges: [VehicleEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type VehicleEdge {
+    cursor: String!
+    node: Vehicle
+}
+
+input CreateVehicleInput {
+    createdById:Int!
+    driverId: Int!
+    typeVehicle: TypeVehicle!
+    weight: Float!
+    licensePlates: String!
+    note: String
+}
+
+input UpdateVehicleInput {
+    vehicleId: Int!
+    createdById:Int!
+    driverId: Int
+    typeVehicle: TypeVehicle
+    weight: Float
+    licensePlates: String
+    note: String
+}
+
+input DeleteVehicleInput {
+    ids: [Int!]!
+    deletedBy: Int!
+}
+
+input ListAllVehicleInput {
+    stringQuery: String
+    driverId: Int
+    typeVehicle: TypeVehicle
+    args: PaginationInput
+}

@@ -48,3 +48,8 @@ export enum formType {
     VAT = 'Thuế VAT',
     tonnage = 'Đơn trọng',
 }
+
+export enum TypeVehicle {
+    container = 'Container',
+    truck = 'Xe tải',
+}

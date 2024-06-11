@@ -35,3 +35,6 @@ generates:
         DeliverOrder: ../db_models/mysql/init-models#deliverOrder
         DeliverOrderEdge: ../db_models/mysql/deliverOrder#DeliverOrderEdge
         DeliverOrderConnection: ../db_models/mysql/deliverOrder#DeliverOrderConnection
+        Vehicle: ../db_models/mysql/init-models#vehicle
+        VehicleEdge: ../db_models/mysql/vehicle#VehicleEdge
+        VehicleConnection: ../db_models/mysql/vehicle#VehicleConnection

@@ -23,6 +23,8 @@ import { user as _user } from './user';
 import type { userAttributes, userCreationAttributes } from './user';
 import { userNotification as _userNotification } from './userNotification';
 import type { userNotificationAttributes, userNotificationCreationAttributes } from './userNotification';
+import { vehicle as _vehicle } from './vehicle';
+import type { vehicleAttributes, vehicleCreationAttributes } from './vehicle';
 
 export {
   _categories as categories,
@@ -37,6 +39,7 @@ export {
   _product as product,
   _user as user,
   _userNotification as userNotification,
+  _vehicle as vehicle,
 };
 
 export type {
@@ -64,6 +67,8 @@ export type {
   userCreationAttributes,
   userNotificationAttributes,
   userNotificationCreationAttributes,
+  vehicleAttributes,
+  vehicleCreationAttributes,
 };
 
 export function initModels(sequelize: Sequelize) {
@@ -79,6 +84,7 @@ export function initModels(sequelize: Sequelize) {
   const product = _product.initModel(sequelize);
   const user = _user.initModel(sequelize);
   const userNotification = _userNotification.initModel(sequelize);
+  const vehicle = _vehicle.initModel(sequelize);
 
   product.belongsTo(categories, { as: 'category_category', foreignKey: 'category'});
   categories.hasMany(product, { as: 'products', foreignKey: 'category'});
@@ -110,6 +116,8 @@ export function initModels(sequelize: Sequelize) {
   user.hasMany(order, { as: 'driver_orders', foreignKey: 'driverId'});
   userNotification.belongsTo(user, { as: 'user', foreignKey: 'userId'});
   user.hasMany(userNotification, { as: 'userNotifications', foreignKey: 'userId'});
+  vehicle.belongsTo(user, { as: 'driver', foreignKey: 'driverId'});
+  user.hasOne(vehicle, { as: 'vehicle', foreignKey: 'driverId'});
 
   return {
     categories,
@@ -124,5 +132,6 @@ export function initModels(sequelize: Sequelize) {
     product,
     user,
     userNotification,
+    vehicle,
   };
 }

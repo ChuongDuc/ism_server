@@ -20,4 +20,5 @@ enum NotificationEvent {
     NewDeliverResolver
     DeliverResolverUpdated
     DeliverResolverDelete
+    NewVehicle
 }

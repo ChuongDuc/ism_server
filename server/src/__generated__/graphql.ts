@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { user, customer, inventory, categories, product, notification, userNotification, order, paymentInfor, itemGroup, orderDetail, deliverOrder } from '../db_models/mysql/init-models';
+import { user, customer, inventory, categories, product, notification, userNotification, order, paymentInfor, itemGroup, orderDetail, deliverOrder, vehicle } from '../db_models/mysql/init-models';
 import { UserEdge, UserConnection } from '../db_models/mysql/user';
 import { CustomerEdge, CustomerConnection } from '../db_models/mysql/customer';
 import { InventoryEdge, InventoryConnection } from '../db_models/mysql/inventory';
@@ -7,6 +7,7 @@ import { ProductEdge, ProductConnection } from '../db_models/mysql/product';
 import { UserNotificationEdge, UserNotificationConnection } from '../db_models/mysql/userNotification';
 import { OrderEdge, OrderConnection } from '../db_models/mysql/order';
 import { DeliverOrderEdge, DeliverOrderConnection } from '../db_models/mysql/deliverOrder';
+import { VehicleEdge, VehicleConnection } from '../db_models/mysql/vehicle';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -121,6 +122,15 @@ export type ICreateUserInput = {
   userName: Scalars['String']['input'];
 };
 
+export type ICreateVehicleInput = {
+  createdById: Scalars['Int']['input'];
+  driverId: Scalars['Int']['input'];
+  licensePlates: Scalars['String']['input'];
+  note?: InputMaybe<Scalars['String']['input']>;
+  typeVehicle: ITypeVehicle;
+  weight: Scalars['Float']['input'];
+};
+
 export type ICustomer = {
   __typename?: 'Customer';
   address?: Maybe<Scalars['String']['output']>;
@@ -170,6 +180,11 @@ export type IDeleteProductByIdInput = {
 };
 
 export type IDeleteUserInput = {
+  ids: Array<Scalars['Int']['input']>;
+};
+
+export type IDeleteVehicleInput = {
+  deletedBy: Scalars['Int']['input'];
   ids: Array<Scalars['Int']['input']>;
 };
 
@@ -326,6 +341,13 @@ export type IListAllProductsInput = {
   unit?: InputMaybe<IUnit>;
 };
 
+export type IListAllVehicleInput = {
+  args?: InputMaybe<IPaginationInput>;
+  driverId?: InputMaybe<Scalars['Int']['input']>;
+  stringQuery?: InputMaybe<Scalars['String']['input']>;
+  typeVehicle?: InputMaybe<ITypeVehicle>;
+};
+
 export type IListArrayUserNotificationInput = {
   args?: InputMaybe<IPaginationInput>;
   event?: InputMaybe<INotificationEvent>;
@@ -348,12 +370,14 @@ export type IMutation = {
   createPriceQuotation: Array<Maybe<IItemGroup>>;
   createProduct: IProduct;
   createUser: IUser;
+  createVehicle: IVehicle;
   deleteCustomer: ISuccessResponse;
   deleteDeliverOrders: ISuccessResponse;
   deleteOrder: ISuccessResponse;
   deletePaymentInfor: ISuccessResponse;
   deleteProductById: ISuccessResponse;
   deleteUser: ISuccessResponse;
+  deleteVehicle: ISuccessResponse;
   importFileExcelInventory: Array<Maybe<IInventory>>;
   importFileExcelProducts: Array<Maybe<IProduct>>;
   resetPassword: ISuccessResponse;
@@ -369,6 +393,7 @@ export type IMutation = {
   updateStatusOrderOfAccountant: ISuccessResponse;
   updateStatusUserNotification: ISuccessResponse;
   updateUser: ISuccessResponse;
+  updateVehicle: ISuccessResponse;
 };
 
 
@@ -412,6 +437,11 @@ export type IMutationCreateUserArgs = {
 };
 
 
+export type IMutationCreateVehicleArgs = {
+  input: ICreateVehicleInput;
+};
+
+
 export type IMutationDeleteCustomerArgs = {
   input: IDeleteCustomerInput;
 };
@@ -439,6 +469,11 @@ export type IMutationDeleteProductByIdArgs = {
 
 export type IMutationDeleteUserArgs = {
   input: IDeleteUserInput;
+};
+
+
+export type IMutationDeleteVehicleArgs = {
+  input: IDeleteVehicleInput;
 };
 
 
@@ -516,6 +551,11 @@ export type IMutationUpdateUserArgs = {
   input: IUpdateUserInput;
 };
 
+
+export type IMutationUpdateVehicleArgs = {
+  input: IUpdateVehicleInput;
+};
+
 export type INotification = {
   __typename?: 'Notification';
   Order?: Maybe<IOrder>;
@@ -535,6 +575,7 @@ export enum INotificationEvent {
   NewMessage = 'NewMessage',
   NewOrder = 'NewOrder',
   NewProduct = 'NewProduct',
+  NewVehicle = 'NewVehicle',
   OrderStatusChanged = 'OrderStatusChanged',
   Payment = 'Payment',
   PaymentChanged = 'PaymentChanged',
@@ -682,7 +723,9 @@ export type IQuery = {
   listAllDeliverOrder: IListAllDeliverOrderResponse;
   listAllInventory: IInventoryConnection;
   listAllProducts: IProductConnection;
+  listAllVehicle: IVehicleConnection;
   listArrayUserNotification: IUserNotificationConnection;
+  listDriverUnselectedVehicle: Array<Maybe<IUser>>;
   listUserNotification: IUserNotificationConnection;
   login: IUserLoginResponse;
   me: IUser;
@@ -723,6 +766,11 @@ export type IQueryListAllInventoryArgs = {
 
 export type IQueryListAllProductsArgs = {
   input: IListAllProductsInput;
+};
+
+
+export type IQueryListAllVehicleArgs = {
+  input: IListAllVehicleInput;
 };
 
 
@@ -800,6 +848,11 @@ export enum ISuccessResponse {
 export enum ITypeProduct {
   Plate = 'plate',
   Shape = 'shape'
+}
+
+export enum ITypeVehicle {
+  Container = 'container',
+  Truck = 'truck'
 }
 
 export enum IUnit {
@@ -945,6 +998,16 @@ export type IUpdateUserInput = {
   userName?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type IUpdateVehicleInput = {
+  createdById: Scalars['Int']['input'];
+  driverId?: InputMaybe<Scalars['Int']['input']>;
+  licensePlates?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  typeVehicle?: InputMaybe<ITypeVehicle>;
+  vehicleId: Scalars['Int']['input'];
+  weight?: InputMaybe<Scalars['Float']['input']>;
+};
+
 export type IUser = {
   __typename?: 'User';
   address?: Maybe<Scalars['String']['output']>;
@@ -1014,6 +1077,31 @@ export type IUsersInput = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<IRole>;
   searchQuery?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IVehicle = {
+  __typename?: 'Vehicle';
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  driver: IUser;
+  id: Scalars['Int']['output'];
+  licensePlates: Scalars['String']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  typeVehicle: ITypeVehicle;
+  updatedAt?: Maybe<Scalars['Date']['output']>;
+  weight: Scalars['Float']['output'];
+};
+
+export type IVehicleConnection = {
+  __typename?: 'VehicleConnection';
+  edges?: Maybe<Array<Maybe<IVehicleEdge>>>;
+  pageInfo: IPageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type IVehicleEdge = {
+  __typename?: 'VehicleEdge';
+  cursor: Scalars['String']['output'];
+  node?: Maybe<IVehicle>;
 };
 
 export type IFilterDate = {
@@ -1112,6 +1200,7 @@ export type IResolversTypes = {
   CreatePriceQuotationInput: ICreatePriceQuotationInput;
   CreateProductInput: ICreateProductInput;
   CreateUserInput: ICreateUserInput;
+  CreateVehicleInput: ICreateVehicleInput;
   Cursor: ResolverTypeWrapper<Scalars['Cursor']['output']>;
   Customer: ResolverTypeWrapper<customer>;
   CustomerConnection: ResolverTypeWrapper<CustomerConnection>;
@@ -1123,6 +1212,7 @@ export type IResolversTypes = {
   DeletePaymentInforInput: IDeletePaymentInforInput;
   DeleteProductByIdInput: IDeleteProductByIdInput;
   DeleteUserInput: IDeleteUserInput;
+  DeleteVehicleInput: IDeleteVehicleInput;
   DeliverOrder: ResolverTypeWrapper<deliverOrder>;
   DeliverOrderConnection: ResolverTypeWrapper<DeliverOrderConnection>;
   DeliverOrderEdge: ResolverTypeWrapper<DeliverOrderEdge>;
@@ -1145,6 +1235,7 @@ export type IResolversTypes = {
   ListAllDeliverOrderResponse: ResolverTypeWrapper<Omit<IListAllDeliverOrderResponse, 'deliverOrder'> & { deliverOrder?: Maybe<IResolversTypes['DeliverOrderConnection']> }>;
   ListAllInventoryInput: IListAllInventoryInput;
   ListAllProductsInput: IListAllProductsInput;
+  ListAllVehicleInput: IListAllVehicleInput;
   ListArrayUserNotificationInput: IListArrayUserNotificationInput;
   ListUserNotificationInput: IListUserNotificationInput;
   Mutation: ResolverTypeWrapper<{}>;
@@ -1172,6 +1263,7 @@ export type IResolversTypes = {
   Subscription: ResolverTypeWrapper<{}>;
   SuccessResponse: ISuccessResponse;
   TypeProduct: ITypeProduct;
+  TypeVehicle: ITypeVehicle;
   Unit: IUnit;
   UpdateCategoryInput: IUpdateCategoryInput;
   UpdateCustomerInput: IUpdateCustomerInput;
@@ -1187,6 +1279,7 @@ export type IResolversTypes = {
   UpdateStatusOrderOfAccountantInput: IUpdateStatusOrderOfAccountantInput;
   UpdateStatusUserNotificationInput: IUpdateStatusUserNotificationInput;
   UpdateUserInput: IUpdateUserInput;
+  UpdateVehicleInput: IUpdateVehicleInput;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
   User: ResolverTypeWrapper<user>;
   UserConnection: ResolverTypeWrapper<UserConnection>;
@@ -1197,6 +1290,9 @@ export type IResolversTypes = {
   UserNotificationConnection: ResolverTypeWrapper<UserNotificationConnection>;
   UserNotificationEdge: ResolverTypeWrapper<UserNotificationEdge>;
   UsersInput: IUsersInput;
+  Vehicle: ResolverTypeWrapper<vehicle>;
+  VehicleConnection: ResolverTypeWrapper<VehicleConnection>;
+  VehicleEdge: ResolverTypeWrapper<VehicleEdge>;
   filterDate: IFilterDate;
   productInput: IProductInput;
 };
@@ -1214,6 +1310,7 @@ export type IResolversParentTypes = {
   CreatePriceQuotationInput: ICreatePriceQuotationInput;
   CreateProductInput: ICreateProductInput;
   CreateUserInput: ICreateUserInput;
+  CreateVehicleInput: ICreateVehicleInput;
   Cursor: Scalars['Cursor']['output'];
   Customer: customer;
   CustomerConnection: CustomerConnection;
@@ -1225,6 +1322,7 @@ export type IResolversParentTypes = {
   DeletePaymentInforInput: IDeletePaymentInforInput;
   DeleteProductByIdInput: IDeleteProductByIdInput;
   DeleteUserInput: IDeleteUserInput;
+  DeleteVehicleInput: IDeleteVehicleInput;
   DeliverOrder: deliverOrder;
   DeliverOrderConnection: DeliverOrderConnection;
   DeliverOrderEdge: DeliverOrderEdge;
@@ -1246,6 +1344,7 @@ export type IResolversParentTypes = {
   ListAllDeliverOrderResponse: Omit<IListAllDeliverOrderResponse, 'deliverOrder'> & { deliverOrder?: Maybe<IResolversParentTypes['DeliverOrderConnection']> };
   ListAllInventoryInput: IListAllInventoryInput;
   ListAllProductsInput: IListAllProductsInput;
+  ListAllVehicleInput: IListAllVehicleInput;
   ListArrayUserNotificationInput: IListArrayUserNotificationInput;
   ListUserNotificationInput: IListUserNotificationInput;
   Mutation: {};
@@ -1282,6 +1381,7 @@ export type IResolversParentTypes = {
   UpdateStatusOrderOfAccountantInput: IUpdateStatusOrderOfAccountantInput;
   UpdateStatusUserNotificationInput: IUpdateStatusUserNotificationInput;
   UpdateUserInput: IUpdateUserInput;
+  UpdateVehicleInput: IUpdateVehicleInput;
   Upload: Scalars['Upload']['output'];
   User: user;
   UserConnection: UserConnection;
@@ -1292,6 +1392,9 @@ export type IResolversParentTypes = {
   UserNotificationConnection: UserNotificationConnection;
   UserNotificationEdge: UserNotificationEdge;
   UsersInput: IUsersInput;
+  Vehicle: vehicle;
+  VehicleConnection: VehicleConnection;
+  VehicleEdge: VehicleEdge;
   filterDate: IFilterDate;
   productInput: IProductInput;
 };
@@ -1443,12 +1546,14 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   createPriceQuotation?: Resolver<Array<Maybe<IResolversTypes['ItemGroup']>>, ParentType, ContextType, RequireFields<IMutationCreatePriceQuotationArgs, 'input'>>;
   createProduct?: Resolver<IResolversTypes['Product'], ParentType, ContextType, RequireFields<IMutationCreateProductArgs, 'input'>>;
   createUser?: Resolver<IResolversTypes['User'], ParentType, ContextType, RequireFields<IMutationCreateUserArgs, 'input'>>;
+  createVehicle?: Resolver<IResolversTypes['Vehicle'], ParentType, ContextType, RequireFields<IMutationCreateVehicleArgs, 'input'>>;
   deleteCustomer?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteCustomerArgs, 'input'>>;
   deleteDeliverOrders?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteDeliverOrdersArgs, 'input'>>;
   deleteOrder?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteOrderArgs, 'input'>>;
   deletePaymentInfor?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeletePaymentInforArgs, 'input'>>;
   deleteProductById?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteProductByIdArgs, 'input'>>;
   deleteUser?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteUserArgs, 'input'>>;
+  deleteVehicle?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationDeleteVehicleArgs, 'input'>>;
   importFileExcelInventory?: Resolver<Array<Maybe<IResolversTypes['Inventory']>>, ParentType, ContextType, RequireFields<IMutationImportFileExcelInventoryArgs, 'input'>>;
   importFileExcelProducts?: Resolver<Array<Maybe<IResolversTypes['Product']>>, ParentType, ContextType, RequireFields<IMutationImportFileExcelProductsArgs, 'input'>>;
   resetPassword?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationResetPasswordArgs, 'input'>>;
@@ -1464,6 +1569,7 @@ export type IMutationResolvers<ContextType = any, ParentType extends IResolversP
   updateStatusOrderOfAccountant?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateStatusOrderOfAccountantArgs, 'input'>>;
   updateStatusUserNotification?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateStatusUserNotificationArgs, 'input'>>;
   updateUser?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateUserArgs, 'input'>>;
+  updateVehicle?: Resolver<IResolversTypes['SuccessResponse'], ParentType, ContextType, RequireFields<IMutationUpdateVehicleArgs, 'input'>>;
 };
 
 export type INotificationResolvers<ContextType = any, ParentType extends IResolversParentTypes['Notification'] = IResolversParentTypes['Notification']> = {
@@ -1599,7 +1705,9 @@ export type IQueryResolvers<ContextType = any, ParentType extends IResolversPare
   listAllDeliverOrder?: Resolver<IResolversTypes['ListAllDeliverOrderResponse'], ParentType, ContextType, RequireFields<IQueryListAllDeliverOrderArgs, 'input'>>;
   listAllInventory?: Resolver<IResolversTypes['InventoryConnection'], ParentType, ContextType, RequireFields<IQueryListAllInventoryArgs, 'input'>>;
   listAllProducts?: Resolver<IResolversTypes['ProductConnection'], ParentType, ContextType, RequireFields<IQueryListAllProductsArgs, 'input'>>;
+  listAllVehicle?: Resolver<IResolversTypes['VehicleConnection'], ParentType, ContextType, RequireFields<IQueryListAllVehicleArgs, 'input'>>;
   listArrayUserNotification?: Resolver<IResolversTypes['UserNotificationConnection'], ParentType, ContextType, RequireFields<IQueryListArrayUserNotificationArgs, 'input'>>;
+  listDriverUnselectedVehicle?: Resolver<Array<Maybe<IResolversTypes['User']>>, ParentType, ContextType>;
   listUserNotification?: Resolver<IResolversTypes['UserNotificationConnection'], ParentType, ContextType, RequireFields<IQueryListUserNotificationArgs, 'input'>>;
   login?: Resolver<IResolversTypes['UserLoginResponse'], ParentType, ContextType, RequireFields<IQueryLoginArgs, 'input'>>;
   me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
@@ -1674,6 +1782,31 @@ export type IUserNotificationEdgeResolvers<ContextType = any, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IVehicleResolvers<ContextType = any, ParentType extends IResolversParentTypes['Vehicle'] = IResolversParentTypes['Vehicle']> = {
+  createdAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  driver?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
+  id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  licensePlates?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  note?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  typeVehicle?: Resolver<IResolversTypes['TypeVehicle'], ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  weight?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IVehicleConnectionResolvers<ContextType = any, ParentType extends IResolversParentTypes['VehicleConnection'] = IResolversParentTypes['VehicleConnection']> = {
+  edges?: Resolver<Maybe<Array<Maybe<IResolversTypes['VehicleEdge']>>>, ParentType, ContextType>;
+  pageInfo?: Resolver<IResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IVehicleEdgeResolvers<ContextType = any, ParentType extends IResolversParentTypes['VehicleEdge'] = IResolversParentTypes['VehicleEdge']> = {
+  cursor?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<Maybe<IResolversTypes['Vehicle']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IResolvers<ContextType = any> = {
   Category?: ICategoryResolvers<ContextType>;
   Cursor?: GraphQLScalarType;
@@ -1713,5 +1846,8 @@ export type IResolvers<ContextType = any> = {
   UserNotification?: IUserNotificationResolvers<ContextType>;
   UserNotificationConnection?: IUserNotificationConnectionResolvers<ContextType>;
   UserNotificationEdge?: IUserNotificationEdgeResolvers<ContextType>;
+  Vehicle?: IVehicleResolvers<ContextType>;
+  VehicleConnection?: IVehicleConnectionResolvers<ContextType>;
+  VehicleEdge?: IVehicleEdgeResolvers<ContextType>;
 };
 

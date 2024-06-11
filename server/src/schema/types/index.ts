@@ -11,6 +11,7 @@ import * as paymentInforType from './paymentInfor.graphql';
 import * as userNotification from './userNotification.graphql';
 import * as priceQuotation from './priceQuotation.graphql';
 import * as deliverOrderType from './deliverOrder.graphql';
+import * as vehicleType from './vehicle.graphql';
 
 export default [
     root,
@@ -25,4 +26,5 @@ export default [
     userNotification,
     priceQuotation,
     deliverOrderType,
+    vehicleType,
 ];

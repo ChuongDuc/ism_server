@@ -21,7 +21,7 @@ export enum NotificationEvent {
     // DeliverRouteUpdate = 'DeliverRouteUpdate',
     // NewCollectionOrder = 'NewCollectionOrder',
     // CollectionOrderUpdate = 'CollectionOrderUpdate',
-    // NewVehicle = 'NewVehicle',
+    NewVehicle = 'NewVehicle',
     // VehicleUpdated = 'VehicleUpdated',
     // VehicleDeleted = 'VehicleDeleted',
     // NewRepairVehicle = 'NewRepairVehicle',
