@@ -1,17 +1,18 @@
 import { FindAndCountOptions, Op, Transaction, WhereOptions } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
+import { IResolvers, ISalesReportRevenueByWeekResponse, ISalesReportRevenueByYearResponse, ISuccessResponse } from '../../__generated__/graphql';
 import { ismDb, sequelize } from '../../loader/mysql';
 import { SmContext } from '../../server';
 import { checkAuthentication } from '../../lib/utils/permision';
 import { MySQLError, PermissionError, UserAlreadyExistError, UserNotFoundError } from '../../lib/classes/graphqlErrors';
 import { generateJWT, USER_JWT } from '../../lib/utils/jwt';
 import { iNotificationEventToValueResolve, iRoleToNumber, roleNumberToIRole } from '../../lib/resolver_enum';
-import { BucketValue, DefaultHashValue, defaultPwReset, RoleList } from '../../lib/enum';
+import { BucketValue, DefaultHashValue, defaultPwReset, RoleList, StatusOrder } from '../../lib/enum';
 import { userCreationAttributes } from '../../db_models/mysql/user';
 import { minIOServices, pubsubService } from '../../lib/classes';
 import { convertRDBRowsToConnection, getRDBPaginationParams, rdbConnectionResolver, rdbEdgeResolver } from '../../lib/utils/relay';
 import { NotificationEvent, PublishMessage } from '../../lib/classes/PubSubService';
+import { getNextNDayFromDate } from '../../lib/utils/formatTime';
 
 const user_resolver: IResolvers = {
     UserEdge: rdbEdgeResolver,
@@ -125,6 +126,230 @@ const user_resolver: IResolvers = {
             return await ismDb.user.findByPk(userId, {
                 rejectOnEmpty: new UserNotFoundError('Người dùng không tồn tại'),
             });
+        },
+
+        salesReportRevenueByWeek: async (_, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            const { saleId, startAt, endAt } = input;
+            const arrayRevenueByWeek: ISalesReportRevenueByWeekResponse[] = [];
+
+            const orderByWeek = await ismDb.order.findAll({
+                where: {
+                    saleId,
+                    status: StatusOrder.done,
+                    createdAt: { [Op.between]: [startAt, getNextNDayFromDate(endAt, 1)] },
+                },
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'sale',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                                include: [
+                                    {
+                                        model: ismDb.product,
+                                        as: 'product',
+                                        required: false,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.paymentInfor,
+                        as: 'paymentInfors',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
+                ],
+            });
+
+            const arrayTotalMoney = orderByWeek.map((order) => order.getTotalMoney());
+            await Promise.all(arrayTotalMoney);
+
+            for (let i = new Date(startAt); i <= new Date(endAt); i = getNextNDayFromDate(i, 1)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const weeklySales = orderByWeek.filter((order) => order.createdAt >= i && order?.createdAt <= getNextNDayFromDate(i, 1));
+
+                const totalRevenue = weeklySales.reduce(
+                    (sumRevenue, order) => sumRevenue + (order ? parseFloat(String(order.totalMoney)) : 0.0),
+                    0.0
+                );
+
+                arrayRevenueByWeek.push({ date: i, totalRevenue });
+            }
+
+            return arrayRevenueByWeek;
+        },
+
+        salesReportRevenueByYear: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            const { saleId, startAt, endAt } = input;
+            const arrayRevenueByYear: ISalesReportRevenueByYearResponse[] = [];
+
+            const orderByYear = await ismDb.order.findAll({
+                where: {
+                    saleId,
+                    status: StatusOrder.done,
+                    createdAt: { [Op.between]: [startAt, getNextNDayFromDate(endAt, 1)] },
+                },
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'sale',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                                include: [
+                                    {
+                                        model: ismDb.product,
+                                        as: 'product',
+                                        required: false,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.paymentInfor,
+                        as: 'paymentInfors',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
+                ],
+            });
+
+            const arrayTotalMoney = orderByYear.map((order) => order.getTotalMoney());
+            await Promise.all(arrayTotalMoney);
+
+            for (let i = 0; i < 12; i += 1) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const yearlySales = orderByYear.filter((order) => order.createdAt.getMonth() === i);
+
+                const totalRevenue = yearlySales.reduce(
+                    (sumRevenue, order) => sumRevenue + (order ? parseFloat(String(order.totalMoney)) : 0.0),
+                    0.0
+                );
+
+                arrayRevenueByYear.push({ month: i, totalRevenue });
+            }
+
+            return arrayRevenueByYear;
+        },
+
+        adminReportRevenueByMonth: async (_parent, { input }, context: SmContext) => {
+            checkAuthentication(context);
+            const { startAt, endAt } = input;
+            const arrayRevenueByMonth = [];
+
+            const orderByMonth = await ismDb.order.findAll({
+                where: {
+                    status: StatusOrder.done,
+                    createdAt: { [Op.between]: [startAt, endAt] },
+                },
+                include: [
+                    {
+                        model: ismDb.user,
+                        as: 'sale',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.customer,
+                        as: 'customer',
+                        required: true,
+                    },
+                    {
+                        model: ismDb.itemGroup,
+                        as: 'itemGroups',
+                        required: false,
+                        include: [
+                            {
+                                model: ismDb.orderDetail,
+                                as: 'orderDetails',
+                                required: false,
+                                include: [
+                                    {
+                                        model: ismDb.product,
+                                        as: 'product',
+                                        required: false,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        model: ismDb.paymentInfor,
+                        as: 'paymentInfors',
+                        required: false,
+                    },
+                    {
+                        model: ismDb.deliverOrder,
+                        as: 'deliverOrders',
+                        required: false,
+                    },
+                ],
+            });
+
+            const arrayTotalMoney = orderByMonth.map((order) => order.getTotalMoney());
+            await Promise.all(arrayTotalMoney);
+
+            const getAllSales = await ismDb.user.findAll({
+                where: {
+                    role: RoleList.sales,
+                },
+            });
+
+            for (let i = 0; i < getAllSales.length; i += 1) {
+                const monthlySales = orderByMonth.filter((order) => order.saleId === getAllSales[i].id);
+                const totalOrder = monthlySales.length;
+                const totalRevenue = monthlySales.reduce(
+                    (sumRevenue, order) => sumRevenue + (order ? parseFloat(String(order.totalMoney)) : 0.0),
+                    0.0
+                );
+
+                const fullName = `${getAllSales[i].lastName} ${getAllSales[i].firstName}`;
+
+                arrayRevenueByMonth.push({ sale: fullName, totalRevenue, totalOrder });
+            }
+
+            return arrayRevenueByMonth;
         },
     },
     Mutation: {

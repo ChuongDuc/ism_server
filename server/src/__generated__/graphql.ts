@@ -30,6 +30,18 @@ export type Scalars = {
   Upload: { input: any; output: any; }
 };
 
+export type IAdminReportRevenueByMonthInput = {
+  endAt: Scalars['Date']['input'];
+  startAt: Scalars['Date']['input'];
+};
+
+export type IAdminReportRevenueByMonthResponse = {
+  __typename?: 'AdminReportRevenueByMonthResponse';
+  sale: Scalars['String']['output'];
+  totalOrder: Scalars['Int']['output'];
+  totalRevenue: Scalars['Float']['output'];
+};
+
 export type ICategory = {
   __typename?: 'Category';
   createdAt?: Maybe<Scalars['Date']['output']>;
@@ -715,6 +727,7 @@ export type IProductEdge = {
 
 export type IQuery = {
   __typename?: 'Query';
+  adminReportRevenueByMonth: Array<Maybe<IAdminReportRevenueByMonthResponse>>;
   filterAllOrder: IFilterAllOrdersResponse;
   getAllCategory: Array<Maybe<ICategory>>;
   getOrderById: IOrder;
@@ -730,7 +743,14 @@ export type IQuery = {
   login: IUserLoginResponse;
   me: IUser;
   productDetail: IProduct;
+  salesReportRevenueByWeek: Array<Maybe<ISalesReportRevenueByWeekResponse>>;
+  salesReportRevenueByYear: Array<Maybe<ISalesReportRevenueByYearResponse>>;
   users: IUserConnection;
+};
+
+
+export type IQueryAdminReportRevenueByMonthArgs = {
+  input: IAdminReportRevenueByMonthInput;
 };
 
 
@@ -794,6 +814,16 @@ export type IQueryProductDetailArgs = {
 };
 
 
+export type IQuerySalesReportRevenueByWeekArgs = {
+  input: ISalesReportRevenueByWeekInput;
+};
+
+
+export type IQuerySalesReportRevenueByYearArgs = {
+  input: ISalesReportRevenueByYearInput;
+};
+
+
 export type IQueryUsersArgs = {
   input: IUsersInput;
 };
@@ -812,6 +842,30 @@ export enum IRole {
   Sales = 'Sales',
   TransporterManager = 'TransporterManager'
 }
+
+export type ISalesReportRevenueByWeekInput = {
+  endAt: Scalars['Date']['input'];
+  saleId: Scalars['Int']['input'];
+  startAt: Scalars['Date']['input'];
+};
+
+export type ISalesReportRevenueByWeekResponse = {
+  __typename?: 'SalesReportRevenueByWeekResponse';
+  date: Scalars['Date']['output'];
+  totalRevenue: Scalars['Float']['output'];
+};
+
+export type ISalesReportRevenueByYearInput = {
+  endAt: Scalars['Date']['input'];
+  saleId: Scalars['Int']['input'];
+  startAt: Scalars['Date']['input'];
+};
+
+export type ISalesReportRevenueByYearResponse = {
+  __typename?: 'SalesReportRevenueByYearResponse';
+  month: Scalars['Int']['output'];
+  totalRevenue: Scalars['Float']['output'];
+};
 
 export enum IStatusOrder {
   CreatNew = 'creatNew',
@@ -1189,6 +1243,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type IResolversTypes = {
+  AdminReportRevenueByMonthInput: IAdminReportRevenueByMonthInput;
+  AdminReportRevenueByMonthResponse: ResolverTypeWrapper<IAdminReportRevenueByMonthResponse>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<categories>;
   CategoryOrderInput: ICategoryOrderInput;
@@ -1257,6 +1313,10 @@ export type IResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   ResetPasswordInput: IResetPasswordInput;
   Role: IRole;
+  SalesReportRevenueByWeekInput: ISalesReportRevenueByWeekInput;
+  SalesReportRevenueByWeekResponse: ResolverTypeWrapper<ISalesReportRevenueByWeekResponse>;
+  SalesReportRevenueByYearInput: ISalesReportRevenueByYearInput;
+  SalesReportRevenueByYearResponse: ResolverTypeWrapper<ISalesReportRevenueByYearResponse>;
   StatusOrder: IStatusOrder;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   SubscribeNotificationsInput: ISubscribeNotificationsInput;
@@ -1299,6 +1359,8 @@ export type IResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type IResolversParentTypes = {
+  AdminReportRevenueByMonthInput: IAdminReportRevenueByMonthInput;
+  AdminReportRevenueByMonthResponse: IAdminReportRevenueByMonthResponse;
   Boolean: Scalars['Boolean']['output'];
   Category: categories;
   CategoryOrderInput: ICategoryOrderInput;
@@ -1364,6 +1426,10 @@ export type IResolversParentTypes = {
   ProductEdge: ProductEdge;
   Query: {};
   ResetPasswordInput: IResetPasswordInput;
+  SalesReportRevenueByWeekInput: ISalesReportRevenueByWeekInput;
+  SalesReportRevenueByWeekResponse: ISalesReportRevenueByWeekResponse;
+  SalesReportRevenueByYearInput: ISalesReportRevenueByYearInput;
+  SalesReportRevenueByYearResponse: ISalesReportRevenueByYearResponse;
   String: Scalars['String']['output'];
   SubscribeNotificationsInput: ISubscribeNotificationsInput;
   Subscription: {};
@@ -1397,6 +1463,13 @@ export type IResolversParentTypes = {
   VehicleEdge: VehicleEdge;
   filterDate: IFilterDate;
   productInput: IProductInput;
+};
+
+export type IAdminReportRevenueByMonthResponseResolvers<ContextType = any, ParentType extends IResolversParentTypes['AdminReportRevenueByMonthResponse'] = IResolversParentTypes['AdminReportRevenueByMonthResponse']> = {
+  sale?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+  totalOrder?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  totalRevenue?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ICategoryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Category'] = IResolversParentTypes['Category']> = {
@@ -1697,6 +1770,7 @@ export type IProductEdgeResolvers<ContextType = any, ParentType extends IResolve
 };
 
 export type IQueryResolvers<ContextType = any, ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']> = {
+  adminReportRevenueByMonth?: Resolver<Array<Maybe<IResolversTypes['AdminReportRevenueByMonthResponse']>>, ParentType, ContextType, RequireFields<IQueryAdminReportRevenueByMonthArgs, 'input'>>;
   filterAllOrder?: Resolver<IResolversTypes['FilterAllOrdersResponse'], ParentType, ContextType, RequireFields<IQueryFilterAllOrderArgs, 'input'>>;
   getAllCategory?: Resolver<Array<Maybe<IResolversTypes['Category']>>, ParentType, ContextType>;
   getOrderById?: Resolver<IResolversTypes['Order'], ParentType, ContextType, RequireFields<IQueryGetOrderByIdArgs, 'id'>>;
@@ -1712,7 +1786,21 @@ export type IQueryResolvers<ContextType = any, ParentType extends IResolversPare
   login?: Resolver<IResolversTypes['UserLoginResponse'], ParentType, ContextType, RequireFields<IQueryLoginArgs, 'input'>>;
   me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
   productDetail?: Resolver<IResolversTypes['Product'], ParentType, ContextType, RequireFields<IQueryProductDetailArgs, 'input'>>;
+  salesReportRevenueByWeek?: Resolver<Array<Maybe<IResolversTypes['SalesReportRevenueByWeekResponse']>>, ParentType, ContextType, RequireFields<IQuerySalesReportRevenueByWeekArgs, 'input'>>;
+  salesReportRevenueByYear?: Resolver<Array<Maybe<IResolversTypes['SalesReportRevenueByYearResponse']>>, ParentType, ContextType, RequireFields<IQuerySalesReportRevenueByYearArgs, 'input'>>;
   users?: Resolver<IResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<IQueryUsersArgs, 'input'>>;
+};
+
+export type ISalesReportRevenueByWeekResponseResolvers<ContextType = any, ParentType extends IResolversParentTypes['SalesReportRevenueByWeekResponse'] = IResolversParentTypes['SalesReportRevenueByWeekResponse']> = {
+  date?: Resolver<IResolversTypes['Date'], ParentType, ContextType>;
+  totalRevenue?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ISalesReportRevenueByYearResponseResolvers<ContextType = any, ParentType extends IResolversParentTypes['SalesReportRevenueByYearResponse'] = IResolversParentTypes['SalesReportRevenueByYearResponse']> = {
+  month?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  totalRevenue?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ISubscriptionResolvers<ContextType = any, ParentType extends IResolversParentTypes['Subscription'] = IResolversParentTypes['Subscription']> = {
@@ -1808,6 +1896,7 @@ export type IVehicleEdgeResolvers<ContextType = any, ParentType extends IResolve
 };
 
 export type IResolvers<ContextType = any> = {
+  AdminReportRevenueByMonthResponse?: IAdminReportRevenueByMonthResponseResolvers<ContextType>;
   Category?: ICategoryResolvers<ContextType>;
   Cursor?: GraphQLScalarType;
   Customer?: ICustomerResolvers<ContextType>;
@@ -1837,6 +1926,8 @@ export type IResolvers<ContextType = any> = {
   ProductConnection?: IProductConnectionResolvers<ContextType>;
   ProductEdge?: IProductEdgeResolvers<ContextType>;
   Query?: IQueryResolvers<ContextType>;
+  SalesReportRevenueByWeekResponse?: ISalesReportRevenueByWeekResponseResolvers<ContextType>;
+  SalesReportRevenueByYearResponse?: ISalesReportRevenueByYearResponseResolvers<ContextType>;
   Subscription?: ISubscriptionResolvers<ContextType>;
   Upload?: GraphQLScalarType;
   User?: IUserResolvers<ContextType>;

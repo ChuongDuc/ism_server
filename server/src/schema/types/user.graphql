@@ -6,6 +6,12 @@ extend type Query {
     users(input: UsersInput!): UserConnection!
 
     getUserById(userId: Int!): User!
+
+    salesReportRevenueByWeek(input: SalesReportRevenueByWeekInput!): [SalesReportRevenueByWeekResponse]!
+
+    salesReportRevenueByYear(input: SalesReportRevenueByYearInput!): [SalesReportRevenueByYearResponse]!
+
+    adminReportRevenueByMonth(input: AdminReportRevenueByMonthInput!): [AdminReportRevenueByMonthResponse]!
 }
 
 extend type Mutation {
@@ -16,6 +22,7 @@ extend type Mutation {
     updateUser(input: UpdateUserInput!): SuccessResponse!
 
     deleteUser(input: DeleteUserInput!): SuccessResponse!
+
 }
 
 extend type Subscription {
@@ -121,6 +128,39 @@ input UsersInput {
     isActive: Boolean
     role: Role
     searchQuery: String
+}
+
+input SalesReportRevenueByWeekInput {
+    saleId: Int!
+    endAt: Date!
+    startAt: Date!
+}
+
+input SalesReportRevenueByYearInput {
+    saleId: Int!
+    endAt: Date!
+    startAt: Date!
+}
+
+input AdminReportRevenueByMonthInput {
+    endAt: Date!
+    startAt: Date!
+}
+
+type AdminReportRevenueByMonthResponse {
+    sale: String!
+    totalRevenue: Float!
+    totalOrder: Int!
+}
+
+type SalesReportRevenueByWeekResponse {
+    date: Date!
+    totalRevenue: Float!
+}
+
+type SalesReportRevenueByYearResponse {
+    month: Int!
+    totalRevenue: Float!
 }
 
 
