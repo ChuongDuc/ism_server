@@ -157,7 +157,6 @@ const product_resolver: IResolvers = {
                             unit: productData['Đơn vị'] ?? undefined,
                             type: productData['Loại'],
                             category: Number(findCategory.id),
-                            subCategory: productData['Danh mục phụ'] ?? undefined,
                             code: productData['Mã sản phẩm'] ?? undefined,
                             available: productData['Tồn kho'] ?? undefined,
                             description: productData['Mô tả'] ?? undefined,

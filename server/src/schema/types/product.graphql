@@ -50,7 +50,6 @@ type Product {
     width: Float
     available: Float
     category: Category!
-    subCategory: String
     unit: Unit
     type: TypeProduct!
     formType: FormType

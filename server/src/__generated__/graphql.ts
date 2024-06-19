@@ -700,7 +700,6 @@ export type IProduct = {
   price: Scalars['Float']['output'];
   priceWithVAT: Scalars['Float']['output'];
   priceWithoutVAT: Scalars['Float']['output'];
-  subCategory?: Maybe<Scalars['String']['output']>;
   type: ITypeProduct;
   unit?: Maybe<IUnit>;
   updatedAt?: Maybe<Scalars['Date']['output']>;
@@ -1747,7 +1746,6 @@ export type IProductResolvers<ContextType = any, ParentType extends IResolversPa
   price?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
   priceWithVAT?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
   priceWithoutVAT?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
-  subCategory?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
   type?: Resolver<IResolversTypes['TypeProduct'], ParentType, ContextType>;
   unit?: Resolver<Maybe<IResolversTypes['Unit']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;

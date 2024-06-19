@@ -16,7 +16,6 @@ export interface productAttributes {
     width?: number;
     available?: number;
     category: number;
-    subCategory?: string;
     unit?: string;
     type: string;
     formType?: string;
@@ -27,17 +26,7 @@ export interface productAttributes {
 
 export type productPk = 'id';
 export type productId = product[productPk];
-export type productOptionalAttributes =
-    | 'id'
-    | 'code'
-    | 'width'
-    | 'available'
-    | 'subCategory'
-    | 'unit'
-    | 'formType'
-    | 'description'
-    | 'createdAt'
-    | 'updatedAt';
+export type productOptionalAttributes = 'id' | 'code' | 'width' | 'available' | 'unit' | 'formType' | 'description' | 'createdAt' | 'updatedAt';
 export type productCreationAttributes = Optional<productAttributes, productOptionalAttributes>;
 
 export type ProductEdge = TRDBEdge<product>;
@@ -65,8 +54,6 @@ export class product extends Model<productAttributes, productCreationAttributes>
     available?: number;
 
     category!: number;
-
-    subCategory?: string;
 
     unit?: string;
 
@@ -164,10 +151,6 @@ export class product extends Model<productAttributes, productCreationAttributes>
                         model: 'categories',
                         key: 'id',
                     },
-                },
-                subCategory: {
-                    type: DataTypes.STRING(200),
-                    allowNull: true,
                 },
                 unit: {
                     type: DataTypes.STRING(200),

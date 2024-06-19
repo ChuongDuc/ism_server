@@ -3,8 +3,8 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import type { deliverOrder, deliverOrderId } from './deliverOrder';
 import type { order, orderId } from './order';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
-import { userNotification } from './init-models';
-import { userNotificationId } from './userNotification';
+import type { userNotification, userNotificationId } from './userNotification';
+import type { vehicle, vehicleId } from './vehicle';
 
 export interface userAttributes {
     id: number;
@@ -148,6 +148,15 @@ export class user extends Model<userAttributes, userCreationAttributes> implemen
     hasUserNotifications!: Sequelize.HasManyHasAssociationsMixin<userNotification, userNotificationId>;
 
     countUserNotifications!: Sequelize.HasManyCountAssociationsMixin;
+
+    // user hasOne vehicle via driverId
+    vehicle!: vehicle;
+
+    getVehicle!: Sequelize.HasOneGetAssociationMixin<vehicle>;
+
+    setVehicle!: Sequelize.HasOneSetAssociationMixin<vehicle, vehicleId>;
+
+    createVehicle!: Sequelize.HasOneCreateAssociationMixin<vehicle>;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof user {
         return user.init(
