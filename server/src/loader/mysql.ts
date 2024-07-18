@@ -38,13 +38,13 @@ export const syncDatabase = async () => {
                 if (isForceSync) {
                     await models.user.bulkCreate(user as any);
                     await models.categories.bulkCreate(categories as any);
-                    await models.product.bulkCreate(product as any);
+                    // await models.product.bulkCreate(product as any);
                     await models.customer.bulkCreate(customer as any);
-                    await models.order.bulkCreate(order as any);
-                    await models.itemGroup.bulkCreate(itemGroup as any);
-                    await models.orderDetail.bulkCreate(orderDetail as any);
-                    await models.paymentInfor.bulkCreate(paymentInfor as any);
-                    await models.inventory.bulkCreate(inventory as any);
+                    // await models.order.bulkCreate(order as any);
+                    // await models.itemGroup.bulkCreate(itemGroup as any);
+                    // await models.orderDetail.bulkCreate(orderDetail as any);
+                    // await models.paymentInfor.bulkCreate(paymentInfor as any);
+                    // await models.inventory.bulkCreate(inventory as any);
                 }
             })
             .catch((err) => {

@@ -6,6 +6,18 @@ extend type Mutation {
     importFileExcelInventory(input: ImportFileExcelInventoryInput! ): [Inventory]!
 }
 
+type Shipment{
+    id: Int!
+    manufactureDate: Date
+    shimentCode: String
+    expiryDate: Date
+    supplierName: String
+    receivedDate: Date
+    inventory: [Inventory!]
+    createdAt: Date
+    updatedAt: Date
+}
+
 type Inventory {
     id: Int!
     productName: String!

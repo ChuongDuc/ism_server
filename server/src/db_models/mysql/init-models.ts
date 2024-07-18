@@ -19,6 +19,8 @@ import { paymentInfor as _paymentInfor } from './paymentInfor';
 import type { paymentInforAttributes, paymentInforCreationAttributes } from './paymentInfor';
 import { product as _product } from './product';
 import type { productAttributes, productCreationAttributes } from './product';
+import { shipment as _shipment } from './shipment';
+import type { shipmentAttributes, shipmentCreationAttributes } from './shipment';
 import { user as _user } from './user';
 import type { userAttributes, userCreationAttributes } from './user';
 import { userNotification as _userNotification } from './userNotification';
@@ -37,6 +39,7 @@ export {
   _orderDetail as orderDetail,
   _paymentInfor as paymentInfor,
   _product as product,
+  _shipment as shipment,
   _user as user,
   _userNotification as userNotification,
   _vehicle as vehicle,
@@ -63,6 +66,8 @@ export type {
   paymentInforCreationAttributes,
   productAttributes,
   productCreationAttributes,
+  shipmentAttributes,
+  shipmentCreationAttributes,
   userAttributes,
   userCreationAttributes,
   userNotificationAttributes,
@@ -82,6 +87,7 @@ export function initModels(sequelize: Sequelize) {
   const orderDetail = _orderDetail.initModel(sequelize);
   const paymentInfor = _paymentInfor.initModel(sequelize);
   const product = _product.initModel(sequelize);
+  const shipment = _shipment.initModel(sequelize);
   const user = _user.initModel(sequelize);
   const userNotification = _userNotification.initModel(sequelize);
   const vehicle = _vehicle.initModel(sequelize);
@@ -108,6 +114,10 @@ export function initModels(sequelize: Sequelize) {
   order.hasMany(paymentInfor, { as: 'paymentInfors', foreignKey: 'orderId'});
   orderDetail.belongsTo(product, { as: 'product', foreignKey: 'productId'});
   product.hasMany(orderDetail, { as: 'orderDetails', foreignKey: 'productId'});
+  inventory.belongsTo(shipment, { as: 'shipment', foreignKey: 'shipmentId'});
+  shipment.hasMany(inventory, { as: 'inventories', foreignKey: 'shipmentId'});
+  product.belongsTo(shipment, { as: 'shipment', foreignKey: 'shipmentId'});
+  shipment.hasMany(product, { as: 'products', foreignKey: 'shipmentId'});
   deliverOrder.belongsTo(user, { as: 'driver', foreignKey: 'driverId'});
   user.hasMany(deliverOrder, { as: 'deliverOrders', foreignKey: 'driverId'});
   order.belongsTo(user, { as: 'sale', foreignKey: 'saleId'});
@@ -130,6 +140,7 @@ export function initModels(sequelize: Sequelize) {
     orderDetail,
     paymentInfor,
     product,
+    shipment,
     user,
     userNotification,
     vehicle,

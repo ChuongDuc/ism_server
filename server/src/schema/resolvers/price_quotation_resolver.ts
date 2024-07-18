@@ -137,6 +137,8 @@ const price_quotation_resolver: IResolvers = {
                     for (let i = 0; i < categoryOrders.length; i += 1) {
                         const orderDetailPromise: Promise<ismDb.orderDetail>[] = [];
 
+                        const inventoryPromise: Promise<ismDb.inventory>[] = [];
+
                         const itemGroupAttribute: itemGroupCreationAttributes = {
                             orderId,
                             description: categoryOrders[i].description ?? undefined,
@@ -152,8 +154,32 @@ const price_quotation_resolver: IResolvers = {
                                 description: element.description ?? undefined,
                                 weightProduct: element.weightProduct ?? undefined,
                             };
+
                             orderDetailPromise.push(ismDb.orderDetail.create(orderDetailAttribute, { transaction: t }));
                         });
+
+                        // eslint-disable-next-line no-restricted-syntax
+                        for (const element of categoryOrders[i].products) {
+                            const product = await ismDb.product.findByPk(element.productId);
+
+                            if (product !== null) {
+                                const inventory = await ismDb.inventory.findOne({
+                                    where: {
+                                        shipmentId: product.shipmentId,
+                                        productName: product.name,
+                                    },
+                                });
+
+                                if (inventory !== null && inventory.quantity > element.quantity) {
+                                    inventory.quantity -= element.quantity;
+                                    inventoryPromise.push(inventory.save());
+                                } else {
+                                    throw new Error('Sản phẩm không đủ số lượng');
+                                }
+                            }
+                        }
+
+                        await Promise.all(inventoryPromise);
                         await Promise.all(orderDetailPromise);
                     }
 
