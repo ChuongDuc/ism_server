@@ -21,7 +21,12 @@ const paymentInfoResolver: IResolvers = {
     Mutation: {
         createPaymentInfor: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
-            if (context.user?.role !== RoleList.accountant && context.user?.role !== RoleList.director && context.user?.role !== RoleList.sales) {
+            if (
+                context.user?.role !== RoleList.accountant &&
+                context.user?.role !== RoleList.director &&
+                context.user?.role !== RoleList.sales &&
+                context.user?.role !== RoleList.driver
+            ) {
                 throw new PermissionError();
             }
 
