@@ -17,6 +17,7 @@ import { SmContext } from '../../server';
 import { ismDb, sequelize } from '../../loader/mysql';
 import { productCreationAttributes } from '../../db_models/mysql/product';
 import { CategoryNotFoundError, MySQLError, ProductNotFoundError } from '../../lib/classes/graphqlErrors';
+import { inventoryCreationAttributes } from '../../db_models/mysql/inventory';
 
 const product_resolver: IResolvers = {
     ProductEdge: rdbEdgeResolver,
@@ -31,6 +32,8 @@ const product_resolver: IResolvers = {
         type: (parent) => ITypeProductTypeResolve(parent.type),
 
         category: async (parent) => parent.category_category ?? (await parent.getCategory_category()),
+
+        shipment: async (parent) => parent.shipment ?? (await parent.getShipment()),
     },
 
     Query: {
@@ -99,6 +102,7 @@ const product_resolver: IResolvers = {
             return await sequelize.transaction(async (t: Transaction) => {
                 try {
                     const productProcess: Promise<ismDb.product>[] = [];
+                    const inventoryProcess: Promise<ismDb.inventory>[] = [];
                     const pathFileExcel = '../../files/upload_excel/';
                     const pathFolderUploadExcel = '/app/src/files/upload_excel';
 
@@ -115,6 +119,15 @@ const product_resolver: IResolvers = {
                     const workbook = XLSX.readFile(path.join(__dirname, pathFileExcel, filename));
                     const sheet_name_list = workbook.SheetNames;
                     const xlData: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+                    const shipment = await ismDb.shipment.findOrCreate({
+                        where: {
+                            shimentCode: xlData[0]['Lô hàng'],
+                        },
+                        defaults: {
+                            receivedDate: new Date(),
+                        },
+                    });
 
                     const getAllProduct = await ismDb.product.findAll();
                     for (let i = 0; i < xlData?.length; i += 1) {
@@ -160,13 +173,27 @@ const product_resolver: IResolvers = {
                             code: productData['Mã sản phẩm'] ?? undefined,
                             available: productData['Tồn kho'] ?? undefined,
                             description: productData['Mô tả'] ?? undefined,
+                            shipmentId: shipment[0].id,
+                        };
+
+                        const createInventoryAttribute: inventoryCreationAttributes = {
+                            code: productData['Mã sản phẩm'] ?? 'ISM221',
+                            productName: productData['Tên'],
+                            unit: productData['Đơn vị'] ?? 'Cái',
+                            quantity: productData['Số lượng'] ?? 1000,
+                            weight: productData['Trọng lượng'] ?? undefined,
+                            fileName: filename,
+                            shipmentId: shipment[0].id,
                         };
                         const newProduct = ismDb.product.create(createProductAttribute, { transaction: t });
+                        const newInventory = ismDb.inventory.create(createInventoryAttribute);
+                        inventoryProcess.push(newInventory);
                         productProcess.push(newProduct);
                     });
 
                     unlinkSync(path.join(__dirname, pathFileExcel, filename));
 
+                    await Promise.all(inventoryProcess);
                     return await Promise.all(productProcess);
                 } catch (error) {
                     await t.rollback();
@@ -317,6 +344,7 @@ const product_resolver: IResolvers = {
                 type: typeProductITypeResolve(productType),
                 category: categoryId,
                 unit: unit ? iUnitToUnit(unit) : undefined,
+                shipmentId: undefined,
             };
 
             return await ismDb.product.create(productAttribute);

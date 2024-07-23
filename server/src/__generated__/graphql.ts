@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { user, customer, inventory, categories, product, notification, userNotification, order, paymentInfor, itemGroup, orderDetail, deliverOrder, vehicle } from '../db_models/mysql/init-models';
+import { user, customer, inventory, categories, product, notification, userNotification, order, paymentInfor, itemGroup, orderDetail, deliverOrder, vehicle, shipment } from '../db_models/mysql/init-models';
 import { UserEdge, UserConnection } from '../db_models/mysql/user';
 import { CustomerEdge, CustomerConnection } from '../db_models/mysql/customer';
 import { InventoryEdge, InventoryConnection } from '../db_models/mysql/inventory';
@@ -700,6 +700,7 @@ export type IProduct = {
   price: Scalars['Float']['output'];
   priceWithVAT: Scalars['Float']['output'];
   priceWithoutVAT: Scalars['Float']['output'];
+  shipment: IShipment;
   type: ITypeProduct;
   unit?: Maybe<IUnit>;
   updatedAt?: Maybe<Scalars['Date']['output']>;
@@ -864,6 +865,19 @@ export type ISalesReportRevenueByYearResponse = {
   __typename?: 'SalesReportRevenueByYearResponse';
   month: Scalars['Int']['output'];
   totalRevenue: Scalars['Float']['output'];
+};
+
+export type IShipment = {
+  __typename?: 'Shipment';
+  createdAt?: Maybe<Scalars['Date']['output']>;
+  expiryDate?: Maybe<Scalars['Date']['output']>;
+  id: Scalars['Int']['output'];
+  inventory?: Maybe<Array<IInventory>>;
+  manufactureDate?: Maybe<Scalars['Date']['output']>;
+  receivedDate?: Maybe<Scalars['Date']['output']>;
+  shimentCode?: Maybe<Scalars['String']['output']>;
+  supplierName?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['Date']['output']>;
 };
 
 export enum IStatusOrder {
@@ -1316,6 +1330,7 @@ export type IResolversTypes = {
   SalesReportRevenueByWeekResponse: ResolverTypeWrapper<ISalesReportRevenueByWeekResponse>;
   SalesReportRevenueByYearInput: ISalesReportRevenueByYearInput;
   SalesReportRevenueByYearResponse: ResolverTypeWrapper<ISalesReportRevenueByYearResponse>;
+  Shipment: ResolverTypeWrapper<shipment>;
   StatusOrder: IStatusOrder;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   SubscribeNotificationsInput: ISubscribeNotificationsInput;
@@ -1429,6 +1444,7 @@ export type IResolversParentTypes = {
   SalesReportRevenueByWeekResponse: ISalesReportRevenueByWeekResponse;
   SalesReportRevenueByYearInput: ISalesReportRevenueByYearInput;
   SalesReportRevenueByYearResponse: ISalesReportRevenueByYearResponse;
+  Shipment: shipment;
   String: Scalars['String']['output'];
   SubscribeNotificationsInput: ISubscribeNotificationsInput;
   Subscription: {};
@@ -1746,6 +1762,7 @@ export type IProductResolvers<ContextType = any, ParentType extends IResolversPa
   price?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
   priceWithVAT?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
   priceWithoutVAT?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
+  shipment?: Resolver<IResolversTypes['Shipment'], ParentType, ContextType>;
   type?: Resolver<IResolversTypes['TypeProduct'], ParentType, ContextType>;
   unit?: Resolver<Maybe<IResolversTypes['Unit']>, ParentType, ContextType>;
   updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
@@ -1798,6 +1815,19 @@ export type ISalesReportRevenueByWeekResponseResolvers<ContextType = any, Parent
 export type ISalesReportRevenueByYearResponseResolvers<ContextType = any, ParentType extends IResolversParentTypes['SalesReportRevenueByYearResponse'] = IResolversParentTypes['SalesReportRevenueByYearResponse']> = {
   month?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
   totalRevenue?: Resolver<IResolversTypes['Float'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IShipmentResolvers<ContextType = any, ParentType extends IResolversParentTypes['Shipment'] = IResolversParentTypes['Shipment']> = {
+  createdAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  expiryDate?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+  inventory?: Resolver<Maybe<Array<IResolversTypes['Inventory']>>, ParentType, ContextType>;
+  manufactureDate?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  receivedDate?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
+  shimentCode?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  supplierName?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+  updatedAt?: Resolver<Maybe<IResolversTypes['Date']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1926,6 +1956,7 @@ export type IResolvers<ContextType = any> = {
   Query?: IQueryResolvers<ContextType>;
   SalesReportRevenueByWeekResponse?: ISalesReportRevenueByWeekResponseResolvers<ContextType>;
   SalesReportRevenueByYearResponse?: ISalesReportRevenueByYearResponseResolvers<ContextType>;
+  Shipment?: IShipmentResolvers<ContextType>;
   Subscription?: ISubscriptionResolvers<ContextType>;
   Upload?: GraphQLScalarType;
   User?: IUserResolvers<ContextType>;

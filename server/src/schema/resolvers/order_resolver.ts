@@ -496,7 +496,36 @@ const order_resolver: IResolvers = {
                         ],
                     });
                     const removeOrderDetail: Promise<number>[] = [];
-                    itemGroups.forEach((itg) => {
+                    const inventoryPromise: Promise<ismDb.inventory>[] = [];
+                    // eslint-disable-next-line no-restricted-syntax
+                    for (const itg of itemGroups) {
+                        // eslint-disable-next-line no-await-in-loop
+                        const orderDetail = await ismDb.orderDetail.findAll({
+                            where: {
+                                itemGroupId: itg.id,
+                            },
+                        });
+
+                        for (let i = 0; i < orderDetail.length; i += 1) {
+                            // eslint-disable-next-line no-await-in-loop
+                            const product = await ismDb.product.findByPk(orderDetail[i].productId);
+
+                            if (product !== null) {
+                                // eslint-disable-next-line no-await-in-loop
+                                const inventory = await ismDb.inventory.findOne({
+                                    where: {
+                                        shipmentId: product.shipmentId,
+                                        productName: product.name,
+                                    },
+                                });
+
+                                if (inventory !== null && orderDetail[i].quantity !== undefined) {
+                                    inventory.quantity += orderDetail[i].quantity ?? 0;
+                                    inventoryPromise.push(inventory.save());
+                                }
+                            }
+                        }
+
                         const destroyOrderDetail = ismDb.orderDetail.destroy({
                             transaction: t,
                             where: {
@@ -504,8 +533,9 @@ const order_resolver: IResolvers = {
                             },
                         });
                         removeOrderDetail.push(destroyOrderDetail);
-                    });
+                    }
                     if (removeOrderDetail.length > 0) {
+                        await Promise.all(inventoryPromise);
                         await Promise.all(removeOrderDetail);
                     }
 

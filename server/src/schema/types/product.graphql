@@ -54,6 +54,7 @@ type Product {
     type: TypeProduct!
     formType: FormType
     description: String
+    shipment: Shipment!
     createdAt: Date
     updatedAt: Date
 }

@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
+import type { shipment, shipmentId } from './shipment';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface inventoryAttributes {
@@ -10,13 +11,14 @@ export interface inventoryAttributes {
     weight?: number;
     unit?: string;
     fileName: string;
+    shipmentId?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export type inventoryPk = 'id';
 export type inventoryId = inventory[inventoryPk];
-export type inventoryOptionalAttributes = 'id' | 'weight' | 'unit' | 'createdAt' | 'updatedAt';
+export type inventoryOptionalAttributes = 'id' | 'weight' | 'unit' | 'shipmentId' | 'createdAt' | 'updatedAt';
 export type inventoryCreationAttributes = Optional<inventoryAttributes, inventoryOptionalAttributes>;
 
 export type InventoryEdge = TRDBEdge<inventory>;
@@ -37,9 +39,20 @@ export class inventory extends Model<inventoryAttributes, inventoryCreationAttri
 
     fileName!: string;
 
+    shipmentId?: number;
+
     createdAt?: Date;
 
     updatedAt?: Date;
+
+    // inventory belongsTo shipment via shipmentId
+    shipment!: shipment;
+
+    getShipment!: Sequelize.BelongsToGetAssociationMixin<shipment>;
+
+    setShipment!: Sequelize.BelongsToSetAssociationMixin<shipment, shipmentId>;
+
+    createShipment!: Sequelize.BelongsToCreateAssociationMixin<shipment>;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof inventory {
         return inventory.init(
@@ -74,6 +87,14 @@ export class inventory extends Model<inventoryAttributes, inventoryCreationAttri
                     type: DataTypes.STRING(200),
                     allowNull: false,
                 },
+                shipmentId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                    references: {
+                        model: 'shipment',
+                        key: 'id',
+                    },
+                },
             },
             {
                 sequelize,
@@ -85,6 +106,11 @@ export class inventory extends Model<inventoryAttributes, inventoryCreationAttri
                         unique: true,
                         using: 'BTREE',
                         fields: [{ name: 'id' }],
+                    },
+                    {
+                        name: 'fk_inventory_1_idx',
+                        using: 'BTREE',
+                        fields: [{ name: 'shipmentId' }],
                     },
                 ],
             }

@@ -16,6 +16,10 @@ const inventory_resolver: IResolvers = {
 
     InventoryConnection: rdbConnectionResolver,
 
+    Shipment: {
+        inventory: async (parent) => parent.inventories ?? (await parent.getInventories()),
+    },
+
     Query: {
         listAllInventory: async (_parent, { input }, context: SmContext) => {
             checkAuthentication(context);
@@ -46,12 +50,12 @@ const inventory_resolver: IResolvers = {
                 };
             }
 
-            if (getInventoryLastUpdated) {
-                const date = new Date(String(getInventoryLastUpdated.updatedAt));
-                whereOptUpdateAt['$inventory.updatedAt$'] = {
-                    [Op.between]: [date, present],
-                };
-            }
+            // if (getInventoryLastUpdated) {
+            //     const date = new Date(String(getInventoryLastUpdated.updatedAt));
+            //     whereOptUpdateAt['$inventory.updatedAt$'] = {
+            //         [Op.between]: [date, present],
+            //     };
+            // }
 
             option.where = isEmpty(whereOpt)
                 ? whereOptUpdateAt
@@ -91,6 +95,15 @@ const inventory_resolver: IResolvers = {
                     const sheet_name_list = workbook.SheetNames;
                     const xlData: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
+                    const shipment = await ismDb.shipment.findOrCreate({
+                        where: {
+                            shimentCode: xlData[0]['Lô hàng'],
+                        },
+                        defaults: {
+                            receivedDate: new Date(),
+                        },
+                    });
+
                     xlData.forEach((productData) => {
                         const createInventoryAttribute: inventoryCreationAttributes = {
                             code: productData['Mã hàng'],
@@ -99,6 +112,7 @@ const inventory_resolver: IResolvers = {
                             quantity: productData['Số lượng'],
                             weight: productData['Đơn trọng'] ?? undefined,
                             fileName: fileName ?? filename,
+                            shipmentId: shipment[0].id,
                         };
                         const newInventory = ismDb.inventory.create(createInventoryAttribute);
                         inventoryProcess.push(newInventory);

@@ -38,3 +38,4 @@ generates:
         Vehicle: ../db_models/mysql/init-models#vehicle
         VehicleEdge: ../db_models/mysql/vehicle#VehicleEdge
         VehicleConnection: ../db_models/mysql/vehicle#VehicleConnection
+        Shipment: ../db_models/mysql/init-models#shipment

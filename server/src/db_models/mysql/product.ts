@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { categories, categoriesId } from './categories';
 import type { orderDetail, orderDetailId } from './orderDetail';
+import type { shipment, shipmentId } from './shipment';
 import { TRDBConnection, TRDBEdge } from '../../lib/utils/relay';
 
 export interface productAttributes {
@@ -20,13 +21,24 @@ export interface productAttributes {
     type: string;
     formType?: string;
     description?: string;
+    shipmentId?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export type productPk = 'id';
 export type productId = product[productPk];
-export type productOptionalAttributes = 'id' | 'code' | 'width' | 'available' | 'unit' | 'formType' | 'description' | 'createdAt' | 'updatedAt';
+export type productOptionalAttributes =
+    | 'id'
+    | 'code'
+    | 'width'
+    | 'available'
+    | 'unit'
+    | 'formType'
+    | 'description'
+    | 'shipmentId'
+    | 'createdAt'
+    | 'updatedAt';
 export type productCreationAttributes = Optional<productAttributes, productOptionalAttributes>;
 
 export type ProductEdge = TRDBEdge<product>;
@@ -63,6 +75,8 @@ export class product extends Model<productAttributes, productCreationAttributes>
 
     description?: string;
 
+    shipmentId?: number;
+
     createdAt?: Date;
 
     updatedAt?: Date;
@@ -98,6 +112,15 @@ export class product extends Model<productAttributes, productCreationAttributes>
     hasOrderDetails!: Sequelize.HasManyHasAssociationsMixin<orderDetail, orderDetailId>;
 
     countOrderDetails!: Sequelize.HasManyCountAssociationsMixin;
+
+    // product belongsTo shipment via shipmentId
+    shipment!: shipment;
+
+    getShipment!: Sequelize.BelongsToGetAssociationMixin<shipment>;
+
+    setShipment!: Sequelize.BelongsToSetAssociationMixin<shipment, shipmentId>;
+
+    createShipment!: Sequelize.BelongsToCreateAssociationMixin<shipment>;
 
     static initModel(sequelize: Sequelize.Sequelize): typeof product {
         return product.init(
@@ -168,6 +191,14 @@ export class product extends Model<productAttributes, productCreationAttributes>
                     type: DataTypes.STRING(200),
                     allowNull: true,
                 },
+                shipmentId: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                    references: {
+                        model: 'shipment',
+                        key: 'id',
+                    },
+                },
             },
             {
                 sequelize,
@@ -184,6 +215,11 @@ export class product extends Model<productAttributes, productCreationAttributes>
                         name: 'fk_product_1_idx',
                         using: 'BTREE',
                         fields: [{ name: 'category' }],
+                    },
+                    {
+                        name: 'fk_product_1_idx1',
+                        using: 'BTREE',
+                        fields: [{ name: 'shipmentId' }],
                     },
                 ],
             }
